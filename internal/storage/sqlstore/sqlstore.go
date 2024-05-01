@@ -1,6 +1,7 @@
 package sqlstore
 
 import (
+	"fmt"
 	"database/sql"
 	_ "github.com/lib/pq"
 )
@@ -9,12 +10,12 @@ type Storage struct{
 	db *sql.DB
 }
 
-fun New(storagePath string) (*Storage, error) { 
-	const op "srorage.sqlstore.New"
+func New(storagePath string) (*Storage, error) { 
+	const op = "srorage.sqlstore.New"
 	db, err := sql.Open("postgres", "postgres://postgres:postgres@localhost:5432/postgres?sslmode=disable") ///!!!перенести в другое место
-	if err!= nil {
-		retur nil, fmt.Errorf("%s: %s", op, err)
+	if err != nil {
+		return nil, fmt.Errorf("%s: %s", op, err)
 	}	
 
-	return db, nil
+	return &Storage{db}, nil
 }
