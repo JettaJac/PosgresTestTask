@@ -3,6 +3,7 @@ package main
 import (
 	// "fmt"
 	"main/internal/config"
+	// "main/internal/app"
 	"log/slog"
 	"os"
 
@@ -19,6 +20,11 @@ func main() {
 	log:= settupLogger(config.Env)
 	log.Info("Start server", slog.String("env", config.Env))
 	log.Debug("Debug messages")
+
+	// if err := app.Run(config); err != nil { // сделать на Run
+	// 	// log.Fatal(err)
+	// }
+
 }
 
 func settupLogger(env string) *slog.Logger { //!!! возможно перенести  другую папку
