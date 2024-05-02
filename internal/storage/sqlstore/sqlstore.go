@@ -102,7 +102,9 @@ func (s *Storage) RunCommand(name, script string)(error){
 	// })
 
 	// r.Run(":8080"
+	return nil
 }
+
 func (s *Storage) GetOneCommand(name string)(string, error){ //ште можно.нужно убрать jnlftn htpekmnfn
 	const op = "storage.sqlstore.GetOneCommand"
 	stmt, err := s.db.Prepare(`SELECT name FROM commands WHERE name = ?`)

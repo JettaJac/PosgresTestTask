@@ -5,6 +5,10 @@ import (
 	"main/internal/config"
 	"main/internal/storage/sqlstore"
 	"main/internal/lib/logger"
+	"main/internal/server/handlers"
+	"net/http"
+
+	"github.com/go-chi/chi"
 	// "main/internal/app"
 	"log/slog"
 	"fmt"
@@ -50,9 +54,32 @@ func main() {
 	// 	os.Exit(1)
 	// }
 	// _ = id
+		router := chi.NewRouter()
+
+		router.Post("/url", save.New(log, storage))
+		log.Info ("starting server", slog.String("address", config.Address))
+
+
+		server:= &http.Server{
+			Addr: config.Address,
+			Handler: router,
+			ReadTimeout: config.HTTPServer.Timeout,
+			WriteTimeout: config.HTTPServer.Timeout,
+			IdleTimeout: config.HTTPServer.IdleTimeout,
+	
+		}
+		 if err := server.ListenAndServe(); err!= nil {
+			log.Error("failed to start server")
+		 }
+
+		 log.Error("server stopped")
+
 
 		fmt.Println(err, storage)
 }
+
+	
+
 
 func settupLogger(env string) *slog.Logger { //!!! возможно перенести  другую папку
 	var log *slog.Logger
