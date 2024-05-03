@@ -33,7 +33,13 @@ func NewServer(config *config.Config /*store storage.Storage ,sessionStore sessi
 }
 
 func (s *server) configureRouter() {
-	// s.router.HandleFunc("/", s.handleHome()).Methods("GET")
+	s.router.HandleFunc("/", s.handleHome())
 	// s.router.HandleFunc("/users", s.handleUsersCreate()).Methods("POST")
 	// s.router.HandleFunc("/sessions", s.handleSessionsCreate()).Methods("POST")
+}
+
+func (s *server) handleHome() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		w.Write([]byte("Hello World"))
+	}
 }
