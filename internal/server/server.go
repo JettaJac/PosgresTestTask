@@ -39,7 +39,7 @@ func (s *server) configureRouter() {
 	s.router.HandleFunc("/test", s.handleHome())
 
 	http.HandleFunc("/", s.handleHome())
-	http.HandleFunc("command/", handleSaveRunScript(s)) // !!! Возможно надо прокинуть лог как у тузова
+	http.HandleFunc("command/", handleSaveRunScript(s, "fjjgfkgjfkj")) // !!! Возможно надо прокинуть лог как у тузова
 	// err := http.ListenAndServe(":8000", nil)
 	// if err != nil {
 	// 	fmt.Println("Error starting server:", err)
@@ -56,7 +56,11 @@ func (s *server) handleHome() http.HandlerFunc {
 	}
 }
 
-func handleSaveRunScript( /*log *slog.Logger,*/ s *server) http.HandlerFunc {
+type ScriptSave interface { //временно тут !!!
+	SaveRunScript(name, script string) (int64, error)
+}
+
+func handleSaveRunScript( /*log *slog.Logger,*/ s *server, script ScriptSave) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 
 		const op = "handlers.Url.save.New"
@@ -82,11 +86,14 @@ func handleSaveRunScript( /*log *slog.Logger,*/ s *server) http.HandlerFunc {
 		// 	Email:    req.Email,
 		// 	Password: req.Password,
 		// }
+		if err := script.SaveRunScript(req.Name, req.Script); err != nil {
 
+		}
 		// if err := s.store.User().Create(u); err != nil {
 		// 	s.error(w, r, http.StatusUnprocessableEntity, err)
 		// 	return
 		// }
-		// s.respond(w, r, http.StatusCreated, u)
+		// s.respond(w, r, http.StatusCreated, u) // она реализована у осн
+
 	}
 }

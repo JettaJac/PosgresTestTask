@@ -70,6 +70,17 @@ func New(storagePath string) (*Storage, error) { // !!! сторыдж патх 
 
 }
 
+func (s *Storage) SaveRunScript(name, script string) /*int64,*/ error {
+	const op = "srorage.sqlstore.SaveRunScript"
+	var id int64
+	err := s.db.QueryRow("INSERT INTO commands (name, script) VALUES ($1, $2) RETURNING id", "name", "script").Scan(&id)
+	if err != nil {
+		return 0, fmt.Errorf("%s: %s", op, err)
+	}
+	return /*id,*/ nil
+
+}
+
 func (s *Storage) SaveScript(urlTOSave, alias string) (int64, error) { //ште можно.нужно убрать
 	const op = "storage.sqlstore.SaveScript"
 	stmt, err := s.db.Prepare(`INSERT INTO commands (name,script) VALUES ($1,$2)`)
