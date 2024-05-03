@@ -39,20 +39,6 @@ func main() {
 	// 	os.Exit(1)
 	// }
 
-	// хз
-	// id, err := storage.SaveScript("qqqqqqqq", "111")
-	// if err!= nil {
-	// 	log.Error("failed to save script", sl.Err(err))
-	// 	os.Exit(1)
-	// }
-	// _ = id
-
-	// id, err = storage.SaveScript("qqqqqqqq", "111")
-	// if err!= nil {
-	// 	log.Error("failed to save script", sl.Err(err))
-	// 	os.Exit(1)
-	// }
-	// _ = id
 	/* // Tuz
 	router := chi.NewRouter()
 
