@@ -5,6 +5,7 @@ import (
 	"log/slog"
 	"main/internal/config"
 	sl "main/internal/lib/logger"
+
 	"main/internal/server"
 	"main/internal/storage/sqlstore"
 	"net/http"
@@ -26,10 +27,11 @@ func Run(config *config.Config) error {
 	defer storage.CloseDB() /// !!! Возможно сделать без вызова доп функции, а сразу закрыть здесь
 
 	// Created server
-	srv := server.NewServer(config /*storage*/)
+	/*srv := */
+	server.NewServer(config, storage /*, log*/)
 	log.Info("starting server", slog.String("address", config.Address))
 
-	_ = srv
+	/*_ = srv*/
 
 	return http.ListenAndServe(config.Address, nil)
 }

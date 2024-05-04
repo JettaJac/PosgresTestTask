@@ -70,14 +70,14 @@ func New(storagePath string) (*Storage, error) { // !!! сторыдж патх 
 
 }
 
-func (s *Storage) SaveRunScript(name, script string) /*int64,*/ error {
+func (s *Storage) SaveRunScript(name, script string, resScript []byte) (int64, error) { // CreateCommand( - название может такое  ..func GetCommands
 	const op = "srorage.sqlstore.SaveRunScript"
 	var id int64
-	err := s.db.QueryRow("INSERT INTO commands (name, script) VALUES ($1, $2) RETURNING id", "name", "script").Scan(&id)
+	err := s.db.QueryRow("INSERT INTO commands (name, script) VALUES ($1, $2, $3) RETURNING id", "name", "script", "result").Scan(&id)
 	if err != nil {
 		return 0, fmt.Errorf("%s: %s", op, err)
 	}
-	return /*id,*/ nil
+	return id, nil
 
 }
 

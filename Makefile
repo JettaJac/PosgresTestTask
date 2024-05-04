@@ -5,8 +5,13 @@ build:
 
 #tests: build
 #	cd tests && go test -v
+cleant:
+#	pwd
+	sh /Users/jettajac/1_clean_1.sh
+	cd /Users/jettajac/Documents/Simple_GO/PosgresTestTask
+	pwd
 
-start: 
+start: cleant
 	go run cmd/main.go
 
 .PHONY: test

@@ -33,31 +33,32 @@ func main() {
 		log.Error("failed to start server")
 	}
 
-	// storage, err := sqlstore.New(config.StoragePath) // Tuz
-	// if err != nil {
-	// 	log.Error("failed to init storage", sl.Err(err))
-	// 	os.Exit(1)
-	// }
+	/*
+		storage, err := sqlstore.New(config.StoragePath) // Tuz
+		if err != nil {
+			log.Error("failed to init storage", sl.Err(err))
+			os.Exit(1)
+		}
 
-	/* // Tuz
-	router := chi.NewRouter()
+		Tuz
+		router := chi.NewRouter()
 
-	// router.Post("/url", save.New(log, storage)) //Tuz
-	log.Info("starting server", slog.String("address", config.Address))
+		router.Post("/url", save.New(log, storage)) //Tuz
+		log.Info("starting server", slog.String("address", config.Address))
 
-	srv := &http.Server{
-		Addr:         config.Address,
-		Handler:      router,
-		ReadTimeout:  config.HTTPServer.Timeout,
-		WriteTimeout: config.HTTPServer.Timeout,
-		IdleTimeout:  config.HTTPServer.IdleTimeout,
-	}
+		srv := &http.Server{
+			Addr:         config.Address,
+			Handler:      router,
+			ReadTimeout:  config.HTTPServer.Timeout,
+			WriteTimeout: config.HTTPServer.Timeout,
+			IdleTimeout:  config.HTTPServer.IdleTimeout,
+		}
 
-	if err := srv.ListenAndServe(); err != nil { // Tuz
-		log.Error("failed to start server")
-	}
-
-	log.Error("server stopped")*/
+		if err := srv.ListenAndServe(); err != nil { // Tuz
+			log.Error("failed to start server")
+		}
+	*/
+	log.Error("server stopped")
 }
 
 // func setupLogger(env string) *slog.Logger { //!!! возможно перенести  другую папку

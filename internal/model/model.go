@@ -8,7 +8,9 @@ type Request struct {
 }
 
 type Response struct {
+	ID     int    `json:"id"`
 	Status string `json:"status"`
-	Error  string `json:"error,omitempty"`
-	Result string `json:"result,omitempty"`
+	Script string `json:"script,omitempty"`
+	// Error  string `json:"error,omitempty"` //скорее всего стату решает
+	Result string `json:"result,omitempty"` // возможноне нежно выводить, подумать
 }
