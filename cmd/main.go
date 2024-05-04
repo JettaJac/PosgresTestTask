@@ -11,6 +11,10 @@ import (
 	sl "main/internal/lib/logger"
 )
 
+// curl -X POST -H "Content-Type: application/json" -d '{"name":"test2","script_file":"testscript2.sh"}' http://localhost:8080/command
+// curl -X POST -H "Content-Type: application/json" -d "{\"name\":\"test\",\"script\":\"#!/bin/bash\necho 'Hello, World'\"}" http://localhost:8080/command
+// good curl -X POST -H "Content-Type: application/json" -d '{"name":"test","script":"#!/bin/bash\necho 'Hello, World!'"}' http://localhost:8080/command
+// curl -XPOST -H "Content-Type: application/json" -d '{"name": "test", "script": "GGGGGGGG"}' http://localhost:8080/command
 const (
 	envLocal = "local"
 	envDev   = "dev"

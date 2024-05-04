@@ -40,7 +40,7 @@ func (s *server) configureRouter() {
 
 	http.HandleFunc("/", s.handleHome())
 	// http.HandleFunc("command/", h.HandleSaveRunScript(s)) // !!! Возможно надо прокинуть лог как у тузова
-	http.HandleFunc("command/", handleSaveRunScript( /*log, */ s)) // !!! Возможно надо прокинуть лог как у тузова// err := http.ListenAndServe(":8000", nil)
+	http.HandleFunc("/command", handleSaveRunScript( /*log, */ s)) // !!! Возможно надо прокинуть лог как у тузова// err := http.ListenAndServe(":8000", nil)
 	// if err != nil {
 	// 	fmt.Println("Error starting server:", err)
 	// }
