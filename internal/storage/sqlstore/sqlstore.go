@@ -4,6 +4,7 @@ package sqlstore
 // migrate -path migrations -database "postgres://localhost/restapi_script?sslmode=disable" up
 
 import (
+	// "encoding/json"
 	"database/sql"
 	// "errors"
 	"fmt"
@@ -11,7 +12,7 @@ import (
 	// "main/internal/storage"
 
 	// "github.com/golang-migrate/migrate"
-
+"net/http"
 	_ "github.com/lib/pq"
 )
 
@@ -97,9 +98,9 @@ func (storage *Storage) CloseDB() {
 
 // }
 
-func (s *Storage) SaveRunScript(req *model.Command) (int64, error) { // CreateCommand( - название может такое  ..func GetCommands
+func (s *Storage) SaveRunScript(req *model.Command) (int, error) { // CreateCommand( - название может такое  ..func GetCommands
 	const op = "srorage.sqlstore.SaveRunScript"
-	// var id int64
+	// var id int
 	err := s.db.QueryRow(
 		"INSERT INTO commandsdb (name, script, result) VALUES ($1, $2, $3) RETURNING id",
 		req.Name, req.Script, req.Result,
@@ -111,7 +112,7 @@ func (s *Storage) SaveRunScript(req *model.Command) (int64, error) { // CreateCo
 
 }
 
-// func (s *Storage) SaveScript(urlTOSave, alias string) (int64, error) { //ште можно.нужно убрать LikeSql
+// func (s *Storage) SaveScript(urlTOSave, alias string) (int, error) { //ште можно.нужно убрать LikeSql
 // 	const op = "storage.sqlstore.SaveScript"
 // 	stmt, err := s.db.Prepare(`INSERT INTO commands (name,script) VALUES ($1,$2)`)
 // 	if err != nil {
@@ -163,7 +164,7 @@ func (s *Storage) RunCommand(name, script string) error {
 	return nil
 }
 // TODO: возможно сделать, чтоб отдавала команду и результат команды
-func (s *Storage) GetOneScript(req *model.Command) (string, error) { //ште можно.нужно убрать jnlftn htpekmnfn
+func (s *Storage) GetOneScript(req *model.Command) (/*string,*/ error) { //ште можно.нужно выдает результат // нужно, чтоб по запросу из браузера отдавал ответ
 	const op = "storage.sqlstore.GetOneCommand"
 
 	
@@ -172,7 +173,7 @@ func (s *Storage) GetOneScript(req *model.Command) (string, error) { //ште м
 		req.ID,
 	).Scan(&req.Result)
 	if err != nil {
-		return "", fmt.Errorf("%s: %s", op, err)
+		return /*"",*/fmt.Errorf("%s: %s", op, err)
 	}
 
 
@@ -190,10 +191,10 @@ func (s *Storage) GetOneScript(req *model.Command) (string, error) { //ште м
 	if err != nil {
 		return "", fmt.Errorf("%s: failed to get last insert id:  %w", op, err)
 	}*/
-	return req.Result, nil
+	return /*req.Result,*/ nil
 }
 
-func (s *Storage) GetListCommands(req *model.Command) ([]model.Command, error) {
+func (s *Storage) GetListCommands(req *model.Command, w http.ResponseWriter) ([]model.Command, error) {
 	const op = "storage.sqlstore.GetListCommands"
 
 	// Выполнение SQL-запроса с db.Query
@@ -204,7 +205,7 @@ func (s *Storage) GetListCommands(req *model.Command) ([]model.Command, error) {
 	defer rows.Close() // закрывать соединение с базой данных
 
   var commands []model.Command
-  
+//   fmt.Fprintf(w, "[")
 for rows.Next(){
    var command model.Command
    if err := rows.Scan(&command.ID, &command.Script, &command.Result); err != nil {
@@ -212,10 +213,45 @@ for rows.Next(){
     return nil, fmt.Errorf("%s: %s", op, err)
    }
    commands = append(commands, command)
+//    json.NewEncoder(w).Encode(command)
+//    
+//    fmt.Fprintf(w, "%v\n", command)
+//    fmt.Fprintf(w, "{\"id\": %d,  \"script\": \"%s\", \"result\": \"%s\"},\n", command.ID,  command.Script, command.Result)
   }
   if err := rows.Err(); err != nil {
 		// log.Fatal(err) //!!! мой лог
 	}
+fmt.Fprintf(w, "")	
+	
+// 	if err := rows.Err(); err != nil {
+//     http.Error(w, "Ошибка при обработке результатов", http.StatusInternalServerError)
+//     return
+// }
+
+/*  /*
+	rows, err := db.Query("SELECT id, name FROM users")
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer rows.Close()
+
+	// Итерация по результатам запроса
+	for rows.Next() {
+		var id int
+		var name string
+		if err := rows.Scan(&id, &name); err != nil {
+			log.Fatal(err)
+		}
+		fmt.Printf("ID: %d, Name: %s\n", id, name)
+	}
+
+	// Проверка ошибок после итерации
+	if err := rows.Err(); err != nil {
+		log.Fatal(err)
+	}
+}
+*/
+fmt.Println(commands)
 return commands, nil
 }
 
@@ -237,25 +273,16 @@ return commands, nil
 // 	return result, nil
 // }
 
-func (s *Storage) DeleteScript(name string) error { return nil }
+func (s *Storage) DeleteCommand(id int) error { 
+	const op = "DeleteCommand"
+	fmt.Println(id)
+	_, err := s.db.Exec(
+		"DELETE FROM commandsdb WHERE id = $1",
+		id,
+	)
+	if err != nil { // !!! не выводит ошибку, если такой записи нет
+		return  fmt.Errorf("%s: %s", op, err)
+	}
+	return nil 
+}
 
-// r.GET("/commands", func(c *gin.Context) {
-//   rows, err := db.Query(`SELECT id, name, script FROM commands`)
-//   if err != nil {
-//    c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-//    return
-//   }
-//   defer rows.Close()
-
-//   var commands []Command
-//   for rows.Next() {
-//    var command Command
-//    if err := rows.Scan(&command.ID, &command.Name, &command.Script); err != nil {
-//     c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-//     return
-//    }
-//    commands = append(commands, command)
-//   }
-
-//   c.JSON(http.StatusOK, commands)
-//  })

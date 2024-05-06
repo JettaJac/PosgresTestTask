@@ -15,7 +15,7 @@ func New() *Storage {
 }
 
 // Create a new command 
-func (r *Storage) SaveRunScript(c *model.Command) (int64, error){
+func (r *Storage) SaveRunScript(c *model.Command) (int, error){
 	// if err := u.Validate(); err != nil {
 	// 	return err
 	// }
@@ -24,7 +24,7 @@ func (r *Storage) SaveRunScript(c *model.Command) (int64, error){
 	// }
 
 	r.commands[c.Script] = c
-	c.ID = int64(len(r.commands)) /// Разобраться с инт64
+	c.ID = len(r.commands) /// Разобраться с инт64
 
 	return c.ID, nil
 }

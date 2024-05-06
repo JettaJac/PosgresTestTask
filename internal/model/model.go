@@ -2,8 +2,8 @@ package model
 
 // Command ... //TODO: возможно стелать как в осн , черезе репозиторий интерфейс В2-15.30
 type Command struct {
-	ID     int64  `json:"id"`
-	Name   string `json:"name"`
+	ID     int  `json:"id"`
+	Name   string `json:"name,omitempty"`
 	Script string `json:"script"` // возможно прикрутить валидацию
 	Result string `json:"result"`
 	// TODO:   если успею прикрутить авторизацию /юзера и пароль

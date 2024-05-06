@@ -49,6 +49,7 @@ func (s *server) configureRouter() {
 	// }
 	http.HandleFunc("/command/find", s.handleGetOneCommand())
     http.HandleFunc("/commands/all", s.handleGetListCommands())
+	http.HandleFunc("/command/delete", s.handleDeleteCommand())
 
 	// s.router.HandleFunc("/users", s.handleUsersCreate()).Methods("POST")
 	// s.router.HandleFunc("/sessions", s.handleSessionsCreate()).Methods("POST")
@@ -64,6 +65,7 @@ func (s *server) error(w http.ResponseWriter, r *http.Request, code int, err err
 
 func (s *server) respond(w http.ResponseWriter, r *http.Request, code int, data interface{}) {
 	w.WriteHeader(code)
+	
 	if data != nil {
 		json.NewEncoder(w).Encode(data)
 	}

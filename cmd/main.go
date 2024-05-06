@@ -13,7 +13,10 @@ import (
 
 // curl -i -X POST -H "Content-Type: application/json" -d '{"name":"test2","script_file":"testscript2.sh"}' http://localhost:8080/command
 // curl -i -X POST -H "Content-Type: application/json" -d '{"name":"test4","script":"#!/bin/bash\necho \"Hello, World\""}' http://127.0.0.1:8080/command
-// curl -i -X GET -H "Content-Type: application/json" -d  http://127.0.0.1:8080/commands/all
+// curl -i -X GET -H "Content-Type: application/json" -d '{"name":"","script":""}' http://127.0.0.1:8080/commands/all
+// curl -i -X GET -H "Content-Type: application/json" -d '{"id":"43","script":""}' http://127.0.0.1:8080/command/find
+// curl -i -X DELETE -H "Content-Type: application/json" -d '{"id":45,"script":""}' http://127.0.0.1:8080/command/delete
+// http://localhost:8080/command/find?id=5
 
 const (
 	envLocal = "local"
@@ -27,7 +30,7 @@ func main() {
 	log := sl.SetupLogger(config.Env)
 	log.Info("Start server", slog.String("env", config.Env))
 	log.Debug("Debug messages")
-
+	// slog.Int("id", 5)
 	//  defer db.Close() TODO:  где-то надо закрыть
 
 	if err := app.Run(config); err != nil { // сделать на Run
