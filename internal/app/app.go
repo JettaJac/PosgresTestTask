@@ -13,7 +13,7 @@ import (
 	// "main/internal/config"
 	// "fmt"
 )
-
+/// TODO:  Добавить гоурутину
 func Run(config *config.Config) error {
 	fmt.Println("Запуск приложения")
 	log := sl.SetupLogger(config.Env)
@@ -24,7 +24,7 @@ func Run(config *config.Config) error {
 		// log.Error("failed to init storage", sl.Err(err)) // /  пока почему то не подключаеться лог/слог
 		os.Exit(1)
 	}
-	defer storage.CloseDB() /// !!! Возможно сделать без вызова доп функции, а сразу закрыть здесь
+	defer storage.CloseDB() /// TODO:  Возможно сделать без вызова доп функции, а сразу закрыть здесь
 
 	// Created server
 	/*srv := */

@@ -2,7 +2,7 @@ package storage
 
 import "errors"
 
-var ( //!!!переписать пож себя названия, и нажо ли мен вообще они
+var ( //TODO: переписать пож себя названия, и нажо ли мен вообще они
 	ErrURLNotFound = errors.New("URL not found")
 	ErrURLExists   = errors.New("URL already exists")
 )

@@ -11,12 +11,13 @@ cleant:
 	cd /Users/jettajac/Documents/Simple_GO/PosgresTestTask
 	pwd
 
-start: cleant
+start: 
 	go run cmd/main.go
 
 .PHONY: test
 test: 
-	cd internal/app && go test
+# пока запускаем с сервера, возможно перенести в другую папку
+	cd internal/server && go test
 # -v -race -timeout 30s ./ ...
 
 clean:

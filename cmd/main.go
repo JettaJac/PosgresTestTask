@@ -1,6 +1,6 @@
 package main
 
-// !!! MacOS указать в документации
+// TODO:  MacOS указать в документации
 import (
 	// "fmt"
 	"main/internal/config"
@@ -11,10 +11,9 @@ import (
 	sl "main/internal/lib/logger"
 )
 
-// curl -X POST -H "Content-Type: application/json" -d '{"name":"test2","script_file":"testscript2.sh"}' http://localhost:8080/command
-// curl -X POST -H "Content-Type: application/json" -d "{\"name\":\"test\",\"script\":\"#!/bin/bash\necho 'Hello, World'\"}" http://localhost:8080/command
-// good curl -X POST -H "Content-Type: application/json" -d '{"name":"test","script":"#!/bin/bash\necho 'Hello, World!'"}' http://localhost:8080/command
-// curl -XPOST -H "Content-Type: application/json" -d '{"name": "test", "script": "GGGGGGGG"}' http://localhost:8080/command
+// curl -i -X POST -H "Content-Type: application/json" -d '{"name":"test2","script_file":"testscript2.sh"}' http://localhost:8080/command
+// curl -i -X POST -H "Content-Type: application/json" -d '{"name":"test4","script":"#!/bin/bash\necho \"Hello, World\""}' http://127.0.0.1:8080/command
+
 const (
 	envLocal = "local"
 	envDev   = "dev"
@@ -28,7 +27,7 @@ func main() {
 	log.Info("Start server", slog.String("env", config.Env))
 	log.Debug("Debug messages")
 
-	//  defer db.Close() !!! где-то надо закрыть
+	//  defer db.Close() TODO:  где-то надо закрыть
 
 	if err := app.Run(config); err != nil { // сделать на Run
 		// log.Fatal(err)
@@ -65,7 +64,7 @@ func main() {
 	log.Error("server stopped")
 }
 
-// func setupLogger(env string) *slog.Logger { //!!! возможно перенести  другую папку
+// func setupLogger(env string) *slog.Logger { //TODO:  возможно перенести  другую папку
 // 	var log *slog.Logger
 // 	switch env {
 // 	case envLocal:

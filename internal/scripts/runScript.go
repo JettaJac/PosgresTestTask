@@ -5,7 +5,7 @@ import (
 	"os/exec"
 )
 
-func Run(script string) ([]byte, error) { // !!! сделать лог, записать в него, в принципе лог возвращаеться и обрабатываеться в месте вызова
+func Run(script string) ([]byte, error) { // TODO:  сделать лог, записать в него, в принципе лог возвращаеться и обрабатываеться в месте вызова
 	const op = "srorage.sqlstore.runScript"
 	result, err := exec.Command("bash", "-c", script).Output()
 	if err != nil {
