@@ -13,6 +13,7 @@ import (
 
 // curl -i -X POST -H "Content-Type: application/json" -d '{"name":"test2","script_file":"testscript2.sh"}' http://localhost:8080/command
 // curl -i -X POST -H "Content-Type: application/json" -d '{"name":"test4","script":"#!/bin/bash\necho \"Hello, World\""}' http://127.0.0.1:8080/command
+// curl -i -X GET -H "Content-Type: application/json" -d  http://127.0.0.1:8080/commands/all
 
 const (
 	envLocal = "local"

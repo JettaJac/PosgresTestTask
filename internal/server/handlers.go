@@ -117,7 +117,7 @@ func (s *server) handleGetOneCommand() http.HandlerFunc {
 
 		_, err := s.storage.GetOneScript(req) //TODO:  нужен интервейс, так не хорошо прокидывать напряму бд
 		// fmt.Println(id)                         //  TODO:  tmp
-		if errors.Is(err, storage.ErrURLExists) { //  TODO: посмотреть, возможно нужно также отдельно проверить, но другуюю ошибку, так как тут ищем, а не создаем
+		if errors.Is(err, storage.ErrURLExists) { // // !!! http.StatusNotFound   TODO: посмотреть, возможно нужно также отдельно проверить, но другуюю ошибку, так как тут ищем, а не создаем
 			// log.Info("url already exists", slog.String("url", req.Name)) TODO: прикрутить лог тузова и раскомментировать
 			// генерирует responced
 			s.error(w, r, http.StatusConflict, err) //  TODO:  проверить правильность статуса (Tuz)
@@ -132,7 +132,7 @@ func (s *server) handleGetOneCommand() http.HandlerFunc {
 		}
 
 		// log.Info("url added", slog.Int64("id", id)) TODO: прикрутить лог тузова и раскомментировать
-		s.respond(w, r, http.StatusCreated, req) // она реализована у осн
+		s.respond(w, r, http.StatusOK, req) // она реализована у осн
 
 // TODO:логи привести к одному виду, одинаковая структура логов в функциях
 		}
@@ -146,15 +146,15 @@ func (s *server) handleGetListCommands() http.HandlerFunc {
 			const op = "handleGetListCommands"
 
 		var req *model.Command //  возможно сделать в каждом хендере свою структуру запроса
+// !!! http.StatusNotFound
+		// if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		// 	fmt.Println("Ошибка   op", op) // прекрутить проектную error.
+		// 	return
+		// }
 
-		if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-			fmt.Println("Ошибка   op", op) // прекрутить проектную error.
-			return
-		}
 
-
-		_, err := s.storage.GetOneScript(req) //TODO:  нужен интервейс, так не хорошо прокидывать напряму бд
-		// fmt.Println(id)                         //  TODO:  tmp
+		listCommands, err := s.storage.GetListCommands(req) //TODO:  нужен интервейс, так не хорошо прокидывать напряму бд
+		// fmt.Println(id)                          //  TODO:  tmp
 		if errors.Is(err, storage.ErrURLExists) { //  TODO: посмотреть, возможно нужно также отдельно проверить, но другуюю ошибку, так как тут ищем, а не создаем
 			// log.Info("url already exists", slog.String("url", req.Name)) TODO: прикрутить лог тузова и раскомментировать
 			// генерирует responced
@@ -170,7 +170,7 @@ func (s *server) handleGetListCommands() http.HandlerFunc {
 		}
 
 		// log.Info("url added", slog.Int64("id", id)) TODO: прикрутить лог тузова и раскомментировать
-		s.respond(w, r, http.StatusCreated, req) // она реализована у осн
+		s.respond(w, r, http.StatusOK, listCommands) // она реализована у осн
 
 // TODO:логи привести к одному виду, одинаковая структура логов в функциях
 		}

@@ -193,60 +193,30 @@ func (s *Storage) GetOneScript(req *model.Command) (string, error) { //ште м
 	return req.Result, nil
 }
 
-func (s *Storage) GetListScrits(req *model.Command) ([]string, error) {
-	const op = "storage.sqlstore.GetListScrits"
+func (s *Storage) GetListCommands(req *model.Command) ([]model.Command, error) {
+	const op = "storage.sqlstore.GetListCommands"
 
-	result := []string{}
-	err := s.db.QueryRow(
-		"SELECT id, name, script FROM commandsdb",
-		req.ID,
-	).Scan(&req.Result)
+	// Выполнение SQL-запроса с db.Query
+	rows, err := s.db.Query("SELECT id, script, result  FROM commandsdb")
 	if err != nil {
 		return nil, fmt.Errorf("%s: %s", op, err)
 	}
+	defer rows.Close() // закрывать соединение с базой данных
 
-	/*  rows, err := db.Query(`SELECT id, name, script FROM commands`)
-  if err != nil {
-   c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-   return
-  }
-  defer rows.Close()
-
-  var commands []Command
-  for rows.Next() {
-   var command Command
-   if err := rows.Scan(&command.ID, &command.Name, &command.Script); err != nil {
-    c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-    return
+  var commands []model.Command
+  
+for rows.Next(){
+   var command model.Command
+   if err := rows.Scan(&command.ID, &command.Script, &command.Result); err != nil {
+    // c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()}) !!! вывести свой лог
+    return nil, fmt.Errorf("%s: %s", op, err)
    }
    commands = append(commands, command)
   }
-  // Выполнение SQL-запроса с db.Query
-	rows, err := db.Query("SELECT id, name FROM users")
-	if err != nil {
-		log.Fatal(err)
+  if err := rows.Err(); err != nil {
+		// log.Fatal(err) //!!! мой лог
 	}
-	defer rows.Close()
-
-	// Итерация по результатам запроса
-	for rows.Next() {
-		var id int
-		var name string
-		if err := rows.Scan(&id, &name); err != nil {
-			log.Fatal(err)
-		}
-		fmt.Printf("ID: %d, Name: %s\n", id, name)
-	}
-
-	// Проверка ошибок после итерации
-	if err := rows.Err(); err != nil {
-		log.Fatal(err)
-	}
-}
-*/
-
-
-return result, nil
+return commands, nil
 }
 
 // func (s *Storage) GetCommands(name string) (string, error) { //ште можно.нужно убрать jnlftn htpekmnfn
