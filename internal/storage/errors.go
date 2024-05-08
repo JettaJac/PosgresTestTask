@@ -1,6 +1,6 @@
 package storage
 
-import "errors"
+import "errors" // Перенести в сторадж
 
 var ( //TODO: переписать пож себя названия, и нажо ли мен вообще они
 	ErrURLNotFound = errors.New("URL not found")

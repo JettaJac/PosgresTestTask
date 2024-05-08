@@ -1,31 +1,27 @@
-
 package config
 
 import (
-	"time"
-	"fmt"
 	"flag"
-	"io/ioutil"
-	"log"
+	"fmt"
 	"gopkg.in/yaml.v3"
-
+	"log"
+	"os"
+	"time"
 )
 
 type Config struct {
-	Env string `yaml:"env" env-default:"local"`
+	Env         string `yaml:"env" env-default:"local"`
 	StoragePath string `yaml:"storage_path" env-required:"true"`
 	DatabaseURL string `yaml:"database_url"` // The database URL to use TODO:  возможно прописать путь к базе данных здесь)
-	HTTPServer `yaml:"http_server"`
+	HTTPServer  `yaml:"http_server"`
 }
 
 type HTTPServer struct {
-  Address string `yaml:"address" env-default:"localhost:8080"`
-  Timeout time.Duration `yaml:"timeout" env-default:"4s"` 
-  // TODO:  Возможно не надо, убрать в будущем
-  IdleTimeout time.Duration `yaml:"idle_timeout" env-default:"60s"`
+	Address string        `yaml:"address" env-default:"localhost:8080"`
+	Timeout time.Duration `yaml:"timeout" env-default:"4s"`
+	// TODO:  Возможно не надо, убрать в будущем
+	IdleTimeout time.Duration `yaml:"idle_timeout" env-default:"60s"`
 }
-
-
 
 // // NewConfig creates a new configuration
 // func NewConfig() *Config {
@@ -35,7 +31,6 @@ type HTTPServer struct {
 // 		// Store:    store.NewConfig(),
 // 	}
 // }
-
 
 // NewConfig creates a new configuration
 
@@ -51,13 +46,14 @@ func NewConfig() *Config {
 	if _, err := os.Stat(configPath); os.IsNotExist(err) {
 		log.Fatalf("Config file %s not found", configPath)
 	}
-*/
+	*/
 	var configPath string
-	
-	flag.StringVar(&configPath, "config-path", "configs/appConfig.yaml", "config file path")
-	flag.Parse()
 
-	configData, err := ioutil.ReadFile(configPath)
+	flag.StringVar(&configPath, "config-path", "configs/appConfig.yaml", "config file path")
+
+	flag.Parse()
+	fmt.Println("________")
+	configData, err := os.ReadFile(configPath)
 	if err != nil {
 		log.Fatalf("Failed to read config file: %s", err)
 	}
@@ -72,11 +68,8 @@ func NewConfig() *Config {
 	return &config
 }
 
-
-
-
 /*
-// go get github.com/ilyakaznacheev/cleanenv 
+// go get github.com/ilyakaznacheev/cleanenv
 func NewConfig() *Config {
 	configPath := os.Getenv("CONFIG_PATH")
 	if configPath == "" {

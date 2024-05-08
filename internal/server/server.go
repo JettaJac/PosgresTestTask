@@ -65,7 +65,7 @@ func (s *server) error(w http.ResponseWriter, r *http.Request, code int, err err
 
 func (s *server) respond(w http.ResponseWriter, r *http.Request, code int, data interface{}) {
 	w.WriteHeader(code)
-	
+	w.Write([]byte("Hello TestHendler"))
 	if data != nil {
 		json.NewEncoder(w).Encode(data)
 	}

@@ -6,6 +6,7 @@ then
 # cd ..
     dev=$(git status | awk 'NR=='1'{print $3}')
     echo "$dev"
+    go fmt
     git add .
     git commit -m "$1"
     # git commit --amend --no-edit # Оставляем прежний коммит

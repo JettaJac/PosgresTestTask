@@ -13,13 +13,14 @@ import (
 	// "main/internal/config"
 	// "fmt"
 )
-/// TODO:  Добавить гоурутину
+
+// / TODO:  Добавить гоурутину
 func Run(config *config.Config) error {
 	fmt.Println("Запуск приложения")
 	log := sl.SetupLogger(config.Env)
 
 	// Created BaseData
-	storage, err := sqlstore.NewDBMY(config.StoragePath)
+	storage, err := sqlstore.NewDB(config.StoragePath)
 	if err != nil {
 		// log.Error("failed to init storage", sl.Err(err)) // /  пока почему то не подключаеться лог/слог
 		os.Exit(1)
@@ -28,10 +29,12 @@ func Run(config *config.Config) error {
 
 	// Created server
 	/*srv := */
-	server.NewServer(config, storage /*, log*/)
+	srv := server.NewServer(config, storage /*, log*/)
 	log.Info("starting server", slog.String("address", config.Address))
 
-	/*_ = srv*/
+	_ = srv
+
+	// srv.ListenAndServe(config.Address, nil)
 
 	return http.ListenAndServe(config.Address, nil)
 }
