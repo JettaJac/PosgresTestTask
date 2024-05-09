@@ -11,15 +11,15 @@ package main
 // имя таблицы вывести в константу 3-е 6в 7.02
 //  allпереписать на селект, 3-е 9в 10.34
 //  инициализировать гит репозиторий
+// убрать name
+// check url
 
 // TODO:  MacOS указать в документации
 import (
 	// "fmt"
-	"main/internal/config"
-
-	"fmt"
 	"log/slog"
 	"main/internal/app"
+	"main/internal/config"
 	sl "main/internal/lib/logger"
 )
 
@@ -43,17 +43,13 @@ func main() {
 	// fmt.Println("Start server")//  перенести все в app
 	config := config.NewConfig()
 	log := sl.SetupLogger(config.Env)
-	log.Info("Start server", slog.String("env", config.Env))
-	log.Debug("Debug messages")
-	// slog.Int("id", 5)
-	//  defer db.Close() TODO:  где-то надо закрыть
+	log.Info("Start app", slog.String("env", config.Env), slog.String("version", "1.0"))
+	log.Debug("debug messages are enabled")
 
 	if err := app.Run(config); err != nil { // сделать на Run
-		// log.Fatal(err)
-		fmt.Println(err)
-		// log.Info("Start app", slog.String("env", config.Env))
 		log.Error("failed to start server")
 	}
+	// log.Info("Start app", slog.String("env", config.Env))
 
 	/*
 		storage, err := sqlstore.New(config.StoragePath) // Tuz
@@ -80,21 +76,5 @@ func main() {
 			log.Error("failed to start server")
 		}
 	*/
-	log.Error("server stopped")
+	log.Info("Server stopped", slog.String("env", config.Env))
 }
-
-// func setupLogger(env string) *slog.Logger { //TODO:  возможно перенести  другую папку
-// 	var log *slog.Logger
-// 	switch env {
-// 	case envLocal:
-// 		log = slog.New(
-// 			slog.NewTextHandler(os.Stdout, &slog.HandlerOptions{Level: slog.LevelDebug}),
-// 		)
-// 	case envDev:
-// 		log = slog.New(slog.NewJSONHandler(os.Stdout, &slog.HandlerOptions{Level: slog.LevelDebug}))
-// 	case envProd:
-// 		log = slog.New(slog.NewJSONHandler(os.Stdout, &slog.HandlerOptions{Level: slog.LevelInfo}))
-// 	}
-
-// 	return log
-// }

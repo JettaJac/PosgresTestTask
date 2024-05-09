@@ -3,12 +3,14 @@ package server
 import (
 	"encoding/json"
 	"errors"
-	"fmt"
 	"main/internal/model"
 	"main/internal/scripts"
 	"main/internal/storage"
 	"net/http"
 	// "strconv"
+	"io"
+	"log/slog"
+	"main/internal/lib/logger"
 )
 
 // import "net/http"
@@ -32,95 +34,84 @@ func (s *server) handleHome() http.HandlerFunc {
 
 func (s *server) handleSaveRunCommand( /*log *slog.Logger, s *server*/ ) http.HandlerFunc { // TODO: возможно сделать как метод сервер в начале в скобках
 	return func(w http.ResponseWriter, r *http.Request) {
-		// TODO:  сделать, чтоб  Postзапрос обрабатывал
-		fmt.Println(r.Method, "save test", http.MethodPost)
-		// if r.Method == http.MethodPost {
+		if r.Method == http.MethodPost {
+			const op = "server.handleSaveRunCommand"
 
-		// }
-		fmt.Println("save test")
-		const op = "handleSaveRunCommand"
+			s.log = s.log.With(
+				slog.String("op", op),
+				// slog.String("request_id", middleware.RequestID(r)), // r.Context
+			)
+			var req *model.Command
 
-		// log = log.With(
-		// 	slog.String("op", op),
-		// 	// slog.String("request_id", middleware.RequestID(r)), // r.Context
-		// )
-		var req *model.Command
-		// fmt.Println(r)
+			err := json.NewDecoder(r.Body).Decode(&req)
+			if errors.Is(err, io.EOF) {
+				// Такую ошибку встретим, если получили запрос с пустым телом.
+				// Обработаем её отдельно
+				s.log.Error("request body is empty")
+				s.error(w, r, http.StatusUnprocessableEntity, err) // "empty request", возможнно добать в сообщение
+			}
 
-		if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-			// fmt.Println(r)
-			// fmt.Println("REQ: ", req)
-			// s.error(w, r, http.StatusBadRequest, err)
-			fmt.Println("Ошибка   op", op) // прекрутить проектную error.
-			/// нужно отправить ответ с соответствующем кодом ошибки
-			// log.Error("failed to decode request", sl.Err(err)) //если по тузову делать или
-			// s.error(w, r, http.StatusBadRequest, err) // ошибка возможно гариллос выбрасывает
+			if err != nil {
+				s.log.Error("failed to decode request", sl.Err(err))
+				s.error(w, r, http.StatusBadRequest, err)
+			}
 
-			return
+			s.log.Info("request body decoded", slog.Any("request", req))
+
+			// у основного создаеться здесь еще одна структура с данными юзер и присваиваев значения с запроса
+			// u := &model.User{
+			// 	Email:    req.Email,
+			// 	Password: req.Password,
+			// }
+			resScript, err := scripts.Run(req.Script) /// TODO:  Написать тесты на эту функцию, по типу тестов бево и валидация
+			if err != nil {
+				s.log.Error("failed to run command", sl.Err(err))
+				s.error(w, r, http.StatusUnprocessableEntity, err)
+
+			}
+			req.Result = string(resScript) // !!! убрать стринг
+
+			id, err := s.storage.SaveRunScript(req) //TODO:  нужен интервейс, так не хорошо прокидывать напряму бд
+			if errors.Is(err, storage.ErrURLExists) {
+				s.log.Info("command already exists", slog.String("command", req.Script))
+				s.error(w, r, http.StatusConflict, err)
+
+			}
+
+			if err != nil {
+				s.log.Error("failed to add command", sl.Err(err))
+				s.error(w, r, http.StatusUnprocessableEntity, err)
+			}
+
+			s.log.Info("command added", slog.Int("id", id)) //TODO: прикрутить лог тузова и раскомментировать
+			s.respond(w, r, http.StatusCreated, req)        // она реализована у осн
+
+		} else {
+			s.log.Error("incorrect request method, need a POST")
+			s.error(w, r, http.StatusMethodNotAllowed, storage.ErrMethod)
 		}
-		// log.Info("request body decoded", slog.Any("request", req)) //Тузов
-
-		// у основного создаеться здесь еще одна структура с данными юзер и присваиваев значения с запроса
-		// u := &model.User{
-		// 	Email:    req.Email,
-		// 	Password: req.Password,
-		// }
-		resScript, err := scripts.Run(req.Script) /// TODO:  Написать тесты на эту функцию, по типу тестов бево и валидация
-		if err != nil {
-			// log.Error("failed to add url", sl.Err(err)) TODO: прикрутить лог тузова и раскомментировать
-
-			s.error(w, r, http.StatusUnprocessableEntity, err)
-			// генерирует responced  у Тузова  render.JSON*w,r,resp.Error("failed to add url")
-			return
-		}
-		req.Result = string(resScript)
-
-		id, err := s.storage.SaveRunScript(req) //TODO:  нужен интервейс, так не хорошо прокидывать напряму бд
-		// fmt.Println(id)                         //  TODO:  tmp
-		if errors.Is(err, storage.ErrURLExists) {
-			// log.Info("url already exists", slog.String("url", req.Name)) TODO: прикрутить лог тузова и раскомментировать
-			// генерирует responced
-			s.error(w, r, http.StatusConflict, err) //  TODO:  проверить правильность статуса (Tuz)
-			return
-		}
-		_ = id
-
-		if err != nil {
-			// log.Error("failed to add url", sl.Err(err)) TODO: прикрутить лог тузова и раскомментировать
-
-			s.error(w, r, http.StatusUnprocessableEntity, err)
-			// генерирует responced  у Тузова  render.JSON*w,r,resp.Error("failed to add url")
-			return
-		}
-		req.Result = string(resScript) //TODO:  возможно изменить тип, чтоб не делать преобразований скорее всего так нельзя, надо сделать запрос в бд и посмотреть записалось ли туда
-		//// if err := s.store.User().Create(u); err != nil {
-		// 	s.error(w, r, http.StatusUnprocessableEntity, err)
-		// 	return
-		// }
-		// log.Info("url added", slog.Int64("id", id)) TODO: прикрутить лог тузова и раскомментировать
-		s.respond(w, r, http.StatusCreated, req) // она реализована у осн
-
-		// } else {
-		// 	// выкинуть ошибку о не правильном методе запроса что то типо  http.Error(w, "Invalid request method", http.StatusMethodNotAllowed)
-		// 	//Применить во всех запросах
-		// 	s.error(w, r, http.StatusMethodNotAllowed, storage.ErrMethod)
-		// 	return
-		// }
 	}
 }
 
 func (s *server) handleGetOneCommand() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		if r.Method == http.MethodGet {
-			const op = "handleGetOneCommand"
+			const op = "server.handleGetOneCommand"
+			s.log = s.log.With(
+				slog.String("op", op),
+				// slog.String("request_id", middleware.RequestID(r)), // r.Context
+			)
 
 			var req *model.Command
+			var id int ///Запрос по id сделать
 
 			if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-				fmt.Println("Ошибка   op", op) // прекрутить проектную error.
+				s.log.Error("failed to decode request")
+				s.error(w, r, http.StatusBadRequest, err)
 				return
 			}
-			// fmt.Println(req)
+
+			s.log.Info("request body decoded", slog.Any("request", req))
 
 			// idStr := r.URL.Query().Get("id") // Получаем значение параметра id из URL
 			// 	if idStr != "" {
@@ -132,82 +123,61 @@ func (s *server) handleGetOneCommand() http.HandlerFunc {
 			// 	}
 			// 	fmt.Println(idStr)
 
-			err := s.storage.GetOneScript(req) //TODO:  нужен интервейс, так не хорошо прокидывать напряму бд
-			// fmt.Println(id)                         //  TODO:  tmp
-			if errors.Is(err, storage.ErrURLExists) { // // !!! http.StatusNotFound   TODO: посмотреть, возможно нужно также отдельно проверить, но другуюю ошибку, так как тут ищем, а не создаем
-				// log.Info("url already exists", slog.String("url", req.Name)) TODO: прикрутить лог тузова и раскомментировать
-				// генерирует responced
-				s.error(w, r, http.StatusConflict, err) //  TODO:  проверить правильность статуса (Tuz)
-				return
+			err := s.storage.GetOneScript(req)
+
+			if errors.Is(err, storage.ErrURLNotFound) {
+				s.log.Info("command not found", slog.String("command", req.Script))
+				s.error(w, r, http.StatusNotFound, err)
 			}
 
 			if err != nil {
-				// log.Error("failed to add url", sl.Err(err)) TODO: прикрутить лог тузова и раскомментировать
-
-				s.error(w, r, http.StatusUnprocessableEntity, err)
-				return
+				s.log.Error("failed to get command by id", sl.Err(err))
+				s.error(w, r, http.StatusUnprocessableEntity, err) //!!! or http.StatusInternalServerError
 			}
 
-			// log.Info("url added", slog.Int64("id", id)) //TODO: прикрутить лог тузова и раскомментировать
-			s.respond(w, r, http.StatusOK, req) // она реализована у осн
+			s.log.Info("got command", slog.Int("id", id))
+			s.respond(w, r, http.StatusOK, req)
 
-			// TODO:логи привести к одному виду, одинаковая структура логов в функциях
 		} else {
-			// выкинуть ошибку о не правильном методе запроса что то типо  http.Error(w, "Invalid request method", http.StatusMethodNotAllowed)
-			//Применить во всех запросах
-			s.error(w, r, http.StatusMethodNotAllowed, storage.ErrMethod) //!!! еще б в лг прокидывалось, было бы шикарно
-			return
+			s.log.Error("incorrect request method, need a GET")
+			s.error(w, r, http.StatusMethodNotAllowed, storage.ErrMethod)
 		}
-
 	}
 }
 
 func (s *server) handleGetListCommands() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		if r.Method == http.MethodGet {
-			const op = "handleGetListCommands"
+			const op = "server.handleGetListCommands"
+			s.log = s.log.With(
+				slog.String("op", op),
+				// slog.String("request_id", middleware.RequestID(r)), // r.Context
+			)
 
-			// var req *model.Command //  возможно сделать в каждом хендере свою структуру запроса
-			// !!! http.StatusNotFound
-			// if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-			// 	fmt.Println("Ошибка   op", op) // прекрутить проектную error.
-			// 	return
-			// }
-
-			listCommands, err := s.storage.GetListCommands( /*req/*, w*/ ) //TODO:  нужен интервейс, так не хорошо прокидывать напряму бд
-			// fmt.Println(id)                          //  TODO:  tmp
-			if errors.Is(err, storage.ErrURLExists) { //  TODO: посмотреть, возможно нужно также отдельно проверить, но другуюю ошибку, так как тут ищем, а не создаем
-				// log.Info("url already exists", slog.String("url", req.Name)) TODO: прикрутить лог тузова и раскомментировать
-				// генерирует responced
-				s.error(w, r, http.StatusConflict, err) //  TODO:  проверить правильность статуса (Tuz)
-				return
-			}
-
+			listCommands, err := s.storage.GetListCommands() //TODO:  нужен интервейс, так не хорошо прокидывать напряму бд
 			if err != nil {
-				// log.Error("failed to add url", sl.Err(err)) TODO: прикрутить лог тузова и раскомментировать
-
-				s.error(w, r, http.StatusUnprocessableEntity, err)
-				return
+				s.log.Error("failed to add command", sl.Err(err))
+				s.error(w, r, http.StatusInternalServerError, err)
 			}
 
-			// log.Info("url added", slog.Int64("id", id)) TODO: прикрутить лог тузова и раскомментировать
-			// fmt.Println("_____")
-			s.respond(w, r, http.StatusOK, listCommands) // она реализована у осн
-
-			// TODO:логи привести к одному виду, одинаковая структура логов в функциях
+			s.log.Info("command list uploaded")
+			s.respond(w, r, http.StatusOK, listCommands)
 		} else {
-			// выкинуть ошибку о не правильном методе запроса что то типо  http.Error(w, "Invalid request method", http.StatusMethodNotAllowed)
-			//Применить во всех запросах
+			s.log.Error("incorrect request method, need a GET")
 			s.error(w, r, http.StatusMethodNotAllowed, storage.ErrMethod)
-			return
 		}
-
 	}
 }
 
 func (s *server) handleDeleteCommand() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		if r.Method == http.MethodDelete {
+			const op = "server.handleDeleteCommand"
+			s.log = s.log.With(
+				slog.String("op", op),
+				// slog.String("request_id", middleware.RequestID(r)), // r.Context
+			)
+
 			// idStr := r.URL.Query().Get("id") // Получаем значение параметра id из URL
 			// if idStr != "" {
 			// 			fmt.Fprintf(w, "Значение параметра id: %s", idStr )// !!!
@@ -216,10 +186,6 @@ func (s *server) handleDeleteCommand() http.HandlerFunc {
 			// 	fmt.Fprintf(w, "Параметр id %s не найден", idStr) // !!!
 			// 	return
 			// }
-
-			fmt.Println(r.Method, r.Body)
-
-			const op = "handleDeleteCommand"
 
 			type Command struct {
 				ID     int    `json:"id"`
@@ -230,38 +196,33 @@ func (s *server) handleDeleteCommand() http.HandlerFunc {
 			var req Command //  возможно сделать в каждом хендере свою структуру запроса
 			// !!! http.StatusNotFound
 			if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-				fmt.Println("Ошибка   op", op) // прекрутить проектную error.
+				s.log.Error("failed to decode request")
+				s.error(w, r, http.StatusBadRequest, err)
 				return
 			}
+			s.log.Info("request body decoded", slog.Any("request", req))
+
 			// id, _ := strconv.Atoi(idStr) //!!! обработать ошибку
 			id := req.ID                       //Пока так, попробовать все таки с браузера забирать
 			err := s.storage.DeleteCommand(id) //TODO:  нужен интервейс, так не хорошо прокидывать напряму бд
-			// fmt.Println(id)                         //  TODO:  tmp
-			if errors.Is(err, storage.ErrURLExists) { // // !!! http.StatusNotFound   TODO: посмотреть, возможно нужно также отдельно проверить, но другуюю ошибку, так как тут ищем, а не создаем
-				// log.Info("url already exists", slog.String("url", req.Name)) TODO: прикрутить лог тузова и раскомментировать
-				// генерирует responced
-				s.error(w, r, http.StatusConflict, err) //  TODO:  проверить правильность статуса (Tuz)
-				return
+
+			if errors.Is(err, storage.ErrURLNotFound) {
+				s.log.Info("command not found", slog.String("command", "req.ID")) /// !!! преобразовать id в стринг
+				s.error(w, r, http.StatusNotFound, err)
 			}
 
 			if err != nil {
-				// log.Error("failed to add url", sl.Err(err)) TODO: прикрутить лог тузова и раскомментировать
-
-				s.error(w, r, http.StatusUnprocessableEntity, err)
-				return
+				s.log.Error("failed to delete command by id", sl.Err(err))
+				s.error(w, r, http.StatusInternalServerError, err) //!!! or http.StatusInternalServerError
 			}
-			req.ID = id // !!! попробовать везде поменять на  int
+
+			req.ID = id
 			req.Result = "No data, script deleted"
-			// log.Info("url added", slog.Int64("id", id)) TODO: прикрутить лог тузова и раскомментировать
+			s.log.Info("script deleted", slog.Int("id", id))
 			s.respond(w, r, http.StatusOK, req) // она реализована у осн
-
 		} else {
-			// выкинуть ошибку о не правильном методе запроса что то типо  http.Error(w, "Invalid request method", http.StatusMethodNotAllowed)
-			//Применить во всех запросах
+			s.log.Error("incorrect request method, need a ВУДУЕУ")
 			s.error(w, r, http.StatusMethodNotAllowed, storage.ErrMethod)
-			return
 		}
-
-		// s.respond(w, r, http.StatusOK, "Script deleted")// !!! должен возвращать Json
 	}
 }

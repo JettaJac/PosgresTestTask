@@ -1,11 +1,11 @@
 package storage
 
-import "errors" // Перенести в сторадж
+import "errors" // Перенести в сторадж // изменить нейминг
 
 var ( //TODO: переписать пож себя названия, и нажо ли мен вообще они
-	ErrURLNotFound = errors.New("URL not found")
-	ErrURLExists   = errors.New("URL already exists")
-	ErrMethod  = errors.New ("Invalid request method") //!!!скорее всего не сюда, переместить, поправить в хендлерах
+	ErrURLExists   = errors.New("Command already exists")
+	ErrURLNotFound = errors.New("Command not found")
+	ErrMethod      = errors.New("Invalid request method") //!!!скорее всего не сюда, переместить, поправить в хендлерах
 )
 
 // type Command struct {

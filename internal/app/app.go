@@ -1,7 +1,7 @@
 package app
 
 import (
-	"fmt"
+	// "fmt"
 	"log/slog"
 	"main/internal/config"
 	sl "main/internal/lib/logger"
@@ -16,23 +16,23 @@ import (
 
 // / TODO:  Добавить гоурутину
 func Run(config *config.Config) error {
-	fmt.Println("Запуск приложения")
 	log := sl.SetupLogger(config.Env)
 
 	// Created BaseData
 	storage, err := sqlstore.NewDB(config.StoragePath)
 	if err != nil {
-		// log.Error("failed to init storage", sl.Err(err)) // /  пока почему то не подключаеться лог/слог
+		log.Error("failed to init storage", sl.Err(err)) // /  пока почему то не подключаеться лог/слог
 		os.Exit(1)
 	}
+	log.Info("Сonnected to the database", slog.String("env", config.Env))
 	defer storage.CloseDB() /// TODO:  Возможно сделать без вызова доп функции, а сразу закрыть здесь
 
 	// Created server
 	/*srv := */
-	srv := server.NewServer(config, storage /*, log*/)
-	log.Info("starting server", slog.String("address", config.Address))
+	srv := server.NewServer(config, storage, log)
+	log.Info("Starting server", slog.String("address", config.Address))
 
-	_ = srv
+	_ = srv //!!!
 
 	// srv.ListenAndServe(config.Address, nil)
 

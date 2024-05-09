@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"time"
 	// "main/internal/config"
+	"log/slog"
 )
 
 type server struct {
@@ -17,18 +18,18 @@ type server struct {
 	WriteTimeout time.Duration
 	IdleTimeout  time.Duration
 	storage      storage.Storage
-	// log       *slog.Logger
+	log          *slog.Logger
 	// storage storage.Storage
 }
 
-func NewServer(config *config.Config, store storage.Storage /*, log *slog.Logger,sessionStore sessions.Store*/) *server {
+func NewServer(config *config.Config, store storage.Storage, log *slog.Logger /*,sessionStore sessions.Store*/) *server {
 	s := &server{
 		router:       http.NewServeMux(),
 		Addr:         config.Address,
 		ReadTimeout:  config.HTTPServer.Timeout,
 		WriteTimeout: config.HTTPServer.Timeout,
 		IdleTimeout:  config.HTTPServer.IdleTimeout,
-		// log: log // logger: logrus.New(),
+		log:          log, // logger: logrus.New(),
 		// storage: store,
 		storage: store,
 		// sessionStore: sessionStore,
@@ -48,7 +49,7 @@ func (s *server) configureRouter() {
 	// 	fmt.Println("Error starting server:", err)
 	// }
 	http.HandleFunc("/command/find", s.handleGetOneCommand())
-    http.HandleFunc("/commands/all", s.handleGetListCommands())
+	http.HandleFunc("/commands/all", s.handleGetListCommands())
 	http.HandleFunc("/command/delete", s.handleDeleteCommand())
 
 	// s.router.HandleFunc("/users", s.handleUsersCreate()).Methods("POST")
@@ -61,11 +62,12 @@ func (s *server) configureRouter() {
 
 func (s *server) error(w http.ResponseWriter, r *http.Request, code int, err error) {
 	s.respond(w, r, code, map[string]string{"error": err.Error()})
+	return
 }
 
 func (s *server) respond(w http.ResponseWriter, r *http.Request, code int, data interface{}) {
 	w.WriteHeader(code)
-	w.Write([]byte("Hello TestHendler"))
+	// w.Write([]byte("Hello TestHendler"))
 	if data != nil {
 		json.NewEncoder(w).Encode(data)
 	}
