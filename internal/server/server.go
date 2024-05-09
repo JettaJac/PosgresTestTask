@@ -60,12 +60,11 @@ func (s *server) configureRouter() {
 // 	SaveRunScript(name, script string) (int64, error)
 // }
 
-func (s *server) error(w http.ResponseWriter, r *http.Request, code int, err error) {
-	s.respond(w, r, code, map[string]string{"error": err.Error()})
-	return
+func (s *server) error(w http.ResponseWriter /*r *http.Request, */, code int, err error) {
+	s.respond(w, code, map[string]string{"error": err.Error()})
 }
 
-func (s *server) respond(w http.ResponseWriter, r *http.Request, code int, data interface{}) {
+func (s *server) respond(w http.ResponseWriter, code int, data interface{}) {
 	w.WriteHeader(code)
 	// w.Write([]byte("Hello TestHendler"))
 	if data != nil {

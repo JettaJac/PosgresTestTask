@@ -15,6 +15,7 @@ import (
 	"fmt"
 	"io"
 	"log"
+	"main/internal/lib/logger"
 	// "main/internal/storage/sqlstore" //тут тестовый тестор д.б
 )
 
@@ -26,6 +27,7 @@ func testNewConfig() *config.Config {
 		// IdleTimeout, _ := time.ParseDuration("1m")
 	}
 }
+
 func TestServer_HandlerCommandCreate(t *testing.T) {
 	// // config := config.NewConfig()
 	// // var  config *config.Config
@@ -48,8 +50,8 @@ func TestServer_HandlerCommandCreate(t *testing.T) {
 	// config.Address = "localhost:8080"
 	// config.Timeout = Timeout
 	// config.IdleTimeout = IdleTimeout
-
-	s := NewServer(config, storage2)
+	var logs = sl.SetupLogger(config.Env)
+	s := NewServer(config, storage2, logs)
 
 	testCase := []struct {
 		name         string

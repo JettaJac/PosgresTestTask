@@ -59,7 +59,7 @@ func New(log *slog.Logger, urlSaver ScriptSave) http.HandlerFunc { // hendler
 		// }
 
 		id, err := urlSaver.SaveScript(req.Name, req.Script)
-		if errors.Is(err, storage.ErrURLExists) {
+		if errors.Is(err, storage.ErrCommandExists) {
 			log.Info("url already exists", slog.String("url", req.Name))
 			// генерирует responced
 			return

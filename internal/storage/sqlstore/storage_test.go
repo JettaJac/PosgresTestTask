@@ -58,7 +58,6 @@ func TestCommand_GetListCommands(t *testing.T) { // good  возможно ту�
 	с := model.TestCommand(t)
 	_, err := storage.SaveRunScript(с)
 	с2 := model.TestCommand(t)
-	с2.Name = "test_2" // убрать
 	с2.Script = "#!/bin/bash\necho \"Hello, World_Second\""
 	_, err = storage.SaveRunScript(с2)
 	if err != nil {

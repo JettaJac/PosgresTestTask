@@ -1,6 +1,6 @@
 package sqlstore
 
-// migrate create  -ext sql -dir migrations create_commands /*-seq init*/ - команда файлы с миграциями
+// migrate create  -ext sql -dir migrations create_commands /*-seq init - команда файлы с миграциями
 // migrate -path migrations -database "postgres://localhost/restapi_script?sslmode=disable" up
 
 import (
@@ -14,6 +14,10 @@ import (
 	// "github.com/golang-migrate/migrate"
 	_ "github.com/lib/pq"
 	// "net/http"
+)
+
+var (
+	table = "commandsdb"
 )
 
 type Storage struct {
@@ -62,9 +66,10 @@ func (storage *Storage) CloseDB() {
 func (s *Storage) SaveRunScript(req *model.Command) (int, error) { // CreateCommand( - название может такое  ..func GetCommands
 	const op = "storage.sqlstore.SaveRunScript"
 
+	query := fmt.Sprintf("INSERT INTO %s (script, result) VALUES ($1, $2) RETURNING id", table)
 	err := s.db.QueryRow(
-		"INSERT INTO commandsdb (name, script, result) VALUES ($1, $2, $3) RETURNING id",
-		req.Name, req.Script, req.Result,
+		query,
+		req.Script, req.Result,
 	).Scan(&req.ID)
 	if err != nil {
 		return 0, fmt.Errorf("%s: %s", op, err)
@@ -75,11 +80,10 @@ func (s *Storage) SaveRunScript(req *model.Command) (int, error) { // CreateComm
 // TODO: возможно сделать, чтоб отдавала команду и результат команды
 func (s *Storage) GetOneScript(req *model.Command) error { //ште можно.нужно выдает результат // нужно, чтоб по запросу из браузера отдавал ответ
 	const op = "storage.sqlstore.GetOneCommand"
-
+	query := fmt.Sprintf("SELECT script,result FROM %s WHERE id = $1", table)
 	err := s.db.QueryRow(
-		"SELECT result FROM commandsdb WHERE id = $1",
-		req.ID,
-	).Scan(&req.Result)
+		/*"SELECT result FROM commandsdb WHERE id = $1"*/ query, req.ID,
+	).Scan(&req.Script, &req.Result)
 	if err != nil {
 		return fmt.Errorf("%s: %s", op, err) // !!! посмотреть как здесь создаеться ошибка Command not found, которую мы потом проверяем
 	}
@@ -103,15 +107,15 @@ func (s *Storage) GetOneScript(req *model.Command) error { //ште можно.�
 
 func (s *Storage) GetListCommands() ([]model.Command, error) {
 	const op = "storage.sqlstore.GetListCommands"
-
+	query := fmt.Sprintf("SELECT id, script, result  FROM %s", table)
 	// Выполнение SQL-запроса с db.Query
-	rows, err := s.db.Query("SELECT id, script, result  FROM commandsdb")
+	var commands []model.Command
+	// err := s.db.Select(&commands, query) !!! проверить сработает ли
+	rows, err := s.db.Query( /*"SELECT id, script, result  FROM commandsdb"*/ query)
 	if err != nil {
 		return nil, fmt.Errorf("%s: %s", op, err)
 	}
 	defer rows.Close() // закрывать соединение с базой данных
-
-	var commands []model.Command
 
 	for rows.Next() {
 		var command model.Command
@@ -173,13 +177,25 @@ func (s *Storage) GetListCommands() ([]model.Command, error) {
 
 func (s *Storage) DeleteCommand(id int) error {
 	const op = "storage.sqlstore.DeleteCommand"
-	// fmt.Println(id)
-	_, err := s.db.Exec(
-		"DELETE FROM commandsdb WHERE id = $1",
+	query := fmt.Sprintf("DELETE FROM %s WHERE id = $1", table)
+
+	res, err := s.db.Exec(
+		/*"DELETE FROM commandsdb WHERE id = $1"*/ query,
 		id,
 	)
+
 	if err != nil { // !!! не выводит пока ошибку, если такой записи нет
 		return fmt.Errorf("%s: %s", op, err)
 	}
+
+	rowsAffected, err := res.RowsAffected()
+	if err != nil {
+		return fmt.Errorf("%s: %s", op, err)
+	}
+
+	if rowsAffected == 0 {
+		return fmt.Errorf("%s: command with id %d not found", op, id)
+	}
+
 	return nil
 }
