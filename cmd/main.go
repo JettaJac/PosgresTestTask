@@ -39,7 +39,6 @@ const (
 )
 
 func main() {
-	// fmt.Println("Start server")//  перенести все в app
 	config := config.NewConfig()
 	log := sl.SetupLogger(config.Env)
 	log.Info("Start app", slog.String("env", config.Env), slog.String("version", "1.0"))

@@ -44,13 +44,13 @@ func (s *server) configureRouter() {
 	http.HandleFunc("/", s.handleHome())
 	// .Methods("POST")
 	// http.HandleFunc("command/", h.HandleSaveRunScript(s)) // TODO:  Возможно надо прокинуть лог как у тузова
-	http.HandleFunc("/command/save", s.handleSaveRunCommand( /*log, */ )) // TODO:  Возможно надо прокинуть лог как у тузова// err := http.ListenAndServe(":8000", nil)
+	http.HandleFunc("/command/save", s.handleSaveRunCommand(*s.log)) // TODO:  Возможно надо прокинуть лог как у тузова// err := http.ListenAndServe(":8000", nil)
 	// if err != nil {
 	// 	fmt.Println("Error starting server:", err)
 	// }
-	http.HandleFunc("/command/find", s.handleGetOneCommand())
-	http.HandleFunc("/commands/all", s.handleGetListCommands())
-	http.HandleFunc("/command/delete", s.handleDeleteCommand())
+	http.HandleFunc("/command/find", s.handleGetOneCommand(*s.log))
+	http.HandleFunc("/commands/all", s.handleGetListCommands(*s.log))
+	http.HandleFunc("/command/delete", s.handleDeleteCommand(*s.log))
 
 	// s.router.HandleFunc("/users", s.handleUsersCreate()).Methods("POST")
 	// s.router.HandleFunc("/sessions", s.handleSessionsCreate()).Methods("POST")

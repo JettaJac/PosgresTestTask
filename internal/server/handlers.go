@@ -32,12 +32,12 @@ func (s *server) handleHome() http.HandlerFunc {
 	}
 }
 
-func (s *server) handleSaveRunCommand( /*log *slog.Logger, s *server*/ ) http.HandlerFunc { // TODO: возможно сделать как метод сервер в начале в скобках
+func (s *server) handleSaveRunCommand(log slog.Logger /*, s *server*/) http.HandlerFunc { // TODO: возможно сделать как метод сервер в начале в скобках
 	return func(w http.ResponseWriter, r *http.Request) {
 		if r.Method == http.MethodPost {
 			const op = "server.handleSaveRunCommand"
 
-			s.log = s.log.With(
+			log = *s.log.With(
 				slog.String("op", op),
 				// slog.String("request_id", middleware.RequestID(r)), // r.Context
 			)
@@ -76,7 +76,7 @@ func (s *server) handleSaveRunCommand( /*log *slog.Logger, s *server*/ ) http.Ha
 
 			id, err := s.storage.SaveRunScript(req) //TODO:  нужен интервейс, так не хорошо прокидывать напряму бд
 			if errors.Is(err, storage.ErrCommandExists) {
-				s.log.Info("command already exists", slog.String("command", req.Script))
+				s.log.Error("command already exists", slog.String("command", req.Script))
 				s.error(w, http.StatusConflict, err)
 				return
 
@@ -99,11 +99,11 @@ func (s *server) handleSaveRunCommand( /*log *slog.Logger, s *server*/ ) http.Ha
 	}
 }
 
-func (s *server) handleGetOneCommand() http.HandlerFunc {
+func (s *server) handleGetOneCommand(log slog.Logger) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		if r.Method == http.MethodGet {
 			const op = "server.handleGetOneCommand"
-			s.log = s.log.With(
+			log = *s.log.With(
 				slog.String("op", op),
 				// slog.String("request_id", middleware.RequestID(r)), // r.Context
 			)
@@ -120,13 +120,13 @@ func (s *server) handleGetOneCommand() http.HandlerFunc {
 			if idStr != "" {
 				id, err := strconv.Atoi(idStr)
 				if err != nil {
-					s.log.Info("incorrect ID entered", slog.String("id: ", idStr))
+					s.log.Error("incorrect ID entered", slog.String("id: ", idStr))
 					s.error(w, http.StatusBadRequest, err)
 					return
 				}
 				req.ID = id
 			} else {
-				s.log.Info("incorrect ID entered", slog.String("id: ", idStr))
+				s.log.Error("incorrect ID entered", slog.String("id: ", idStr))
 				s.error(w, http.StatusBadRequest, storage.ErrEmptyRequest)
 				return
 			}
@@ -143,7 +143,7 @@ func (s *server) handleGetOneCommand() http.HandlerFunc {
 			err := s.storage.GetOneScript(req)
 
 			if errors.Is(err, storage.ErrCommandNotFound) {
-				s.log.Info("command not found", slog.String("command", req.Script))
+				s.log.Error("command not found", slog.String("command", req.Script))
 				s.error(w, http.StatusNotFound, err)
 				return
 			}
@@ -165,11 +165,11 @@ func (s *server) handleGetOneCommand() http.HandlerFunc {
 	}
 }
 
-func (s *server) handleGetListCommands() http.HandlerFunc {
+func (s *server) handleGetListCommands(log slog.Logger) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		if r.Method == http.MethodGet {
 			const op = "server.handleGetListCommands"
-			s.log = s.log.With(
+			log = *s.log.With(
 				slog.String("op", op),
 				// slog.String("request_id", middleware.RequestID(r)), // r.Context
 			)
@@ -191,11 +191,11 @@ func (s *server) handleGetListCommands() http.HandlerFunc {
 	}
 }
 
-func (s *server) handleDeleteCommand() http.HandlerFunc {
+func (s *server) handleDeleteCommand(log slog.Logger) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		if r.Method == http.MethodDelete {
 			const op = "server.handleDeleteCommand"
-			s.log = s.log.With(
+			log = *s.log.With(
 				slog.String("op", op),
 				// slog.String("request_id", middleware.RequestID(r)), // r.Context
 			)
@@ -210,13 +210,13 @@ func (s *server) handleDeleteCommand() http.HandlerFunc {
 			if idStr != "" {
 				id, err := strconv.Atoi(idStr)
 				if err != nil {
-					s.log.Info("incorrect ID entered", slog.String("id: ", idStr))
+					s.log.Error("incorrect ID entered", slog.String("id: ", idStr))
 					s.error(w, http.StatusBadRequest, err)
 					return
 				}
 				req.ID = id
 			} else {
-				s.log.Info("incorrect ID entered", slog.String("id: ", idStr))
+				s.log.Error("incorrect ID entered", slog.String("id: ", idStr))
 				s.error(w, http.StatusBadRequest, storage.ErrEmptyRequest)
 				return
 			}
@@ -240,7 +240,7 @@ func (s *server) handleDeleteCommand() http.HandlerFunc {
 			err := s.storage.DeleteCommand(req.ID) //TODO:  нужен интервейс, так не хорошо прокидывать напряму бд
 
 			if errors.Is(err, storage.ErrCommandNotFound) {
-				s.log.Info("command not found", slog.String("command", strconv.Itoa(req.ID))) /// !!! преобразовать id в стринг
+				s.log.Error("command not found", slog.String("command", strconv.Itoa(req.ID))) /// !!! преобразовать id в стринг
 				s.error(w, http.StatusNotFound, err)
 				return
 			}
