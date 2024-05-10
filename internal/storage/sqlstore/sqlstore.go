@@ -17,7 +17,7 @@ import (
 )
 
 var (
-	table = "commandsdb"
+	Table = "commandsdb"
 )
 
 type Storage struct {
@@ -66,7 +66,7 @@ func (storage *Storage) CloseDB() {
 func (s *Storage) SaveRunScript(req *model.Command) (int, error) { // CreateCommand( - название может такое  ..func GetCommands
 	const op = "storage.sqlstore.SaveRunScript"
 
-	query := fmt.Sprintf("INSERT INTO %s (script, result) VALUES ($1, $2) RETURNING id", table)
+	query := fmt.Sprintf("INSERT INTO %s (script, result) VALUES ($1, $2) RETURNING id", Table)
 	err := s.db.QueryRow(
 		query,
 		req.Script, req.Result,
@@ -78,14 +78,21 @@ func (s *Storage) SaveRunScript(req *model.Command) (int, error) { // CreateComm
 }
 
 // TODO: возможно сделать, чтоб отдавала команду и результат команды
-func (s *Storage) GetOneScript(req *model.Command) error { //ште можно.нужно выдает результат // нужно, чтоб по запросу из браузера отдавал ответ
+func (s *Storage) GetOneScript(id int) (*model.Command, error) { //ште можно.нужно выдает результат // нужно, чтоб по запросу из браузера отдавал ответ
 	const op = "storage.sqlstore.GetOneCommand"
-	query := fmt.Sprintf("SELECT script,result FROM %s WHERE id = $1", table)
+
+	req := &model.Command{
+		ID:     id,
+		Script: "",
+		Result: "",
+	}
+
+	query := fmt.Sprintf("SELECT script, result FROM %s WHERE id = $1", Table)
 	err := s.db.QueryRow(
 		/*"SELECT result FROM commandsdb WHERE id = $1"*/ query, req.ID,
 	).Scan(&req.Script, &req.Result)
 	if err != nil {
-		return fmt.Errorf("%s: %s", op, err) // !!! посмотреть как здесь создаеться ошибка Command not found, которую мы потом проверяем
+		return nil, fmt.Errorf("%s: %s", op, err) // !!! посмотреть как здесь создаеться ошибка Command not found, которую мы потом проверяем
 	}
 
 	/*
@@ -102,12 +109,12 @@ func (s *Storage) GetOneScript(req *model.Command) error { //ште можно.�
 		if err != nil {
 			return "", fmt.Errorf("%s: failed to get last insert id:  %w", op, err)
 		}*/
-	return nil
+	return req, nil
 }
 
 func (s *Storage) GetListCommands() ([]model.Command, error) {
 	const op = "storage.sqlstore.GetListCommands"
-	query := fmt.Sprintf("SELECT id, script, result  FROM %s", table)
+	query := fmt.Sprintf("SELECT id, script, result  FROM %s", Table)
 	// Выполнение SQL-запроса с db.Query
 	var commands []model.Command
 	// err := s.db.Select(&commands, query) !!! проверить сработает ли
@@ -177,7 +184,7 @@ func (s *Storage) GetListCommands() ([]model.Command, error) {
 
 func (s *Storage) DeleteCommand(id int) error {
 	const op = "storage.sqlstore.DeleteCommand"
-	query := fmt.Sprintf("DELETE FROM %s WHERE id = $1", table)
+	query := fmt.Sprintf("DELETE FROM %s WHERE id = $1", Table)
 
 	res, err := s.db.Exec(
 		/*"DELETE FROM commandsdb WHERE id = $1"*/ query,

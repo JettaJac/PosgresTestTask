@@ -108,23 +108,19 @@ func (s *server) handleGetOneCommand(log slog.Logger) http.HandlerFunc {
 				// slog.String("request_id", middleware.RequestID(r)), // r.Context
 			)
 
-			// var req *model.Command
-			req := &model.Command{
-				ID:     0,
-				Script: "",
-				Result: "",
-			}
+			var id int
 
 			///Запрос по id сделать
 			idStr := r.URL.Query().Get("id") // Получаем значение параметра id из URL
 			if idStr != "" {
-				id, err := strconv.Atoi(idStr)
+				var err error
+				id, err = strconv.Atoi(idStr)
 				if err != nil {
 					s.log.Error("incorrect ID entered", slog.String("id: ", idStr))
 					s.error(w, http.StatusBadRequest, err)
 					return
 				}
-				req.ID = id
+
 			} else {
 				s.log.Error("incorrect ID entered", slog.String("id: ", idStr))
 				s.error(w, http.StatusBadRequest, storage.ErrEmptyRequest)
@@ -140,7 +136,7 @@ func (s *server) handleGetOneCommand(log slog.Logger) http.HandlerFunc {
 
 			// s.log.Info("request body decoded", slog.Any("request", req))
 
-			err := s.storage.GetOneScript(req)
+			req, err := s.storage.GetOneScript(id)
 
 			if errors.Is(err, storage.ErrCommandNotFound) {
 				s.log.Error("command not found", slog.String("command", req.Script))
