@@ -38,19 +38,23 @@ func NewServer(config *config.Config, store storage.Storage, log *slog.Logger /*
 	return s
 }
 
+func (s *server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	s.router.ServeHTTP(w, r)
+} /// скорее всего не нужно
+
 func (s *server) configureRouter() {
 	s.router.HandleFunc("/test", s.handleHome())
 
-	http.HandleFunc("/", s.handleHome())
+	s.router.HandleFunc("/", s.handleHome())
 	// .Methods("POST")
 	// http.HandleFunc("command/", h.HandleSaveRunScript(s)) // TODO:  Возможно надо прокинуть лог как у тузова
-	http.HandleFunc("/command/save", s.handleSaveRunCommand(*s.log)) // TODO:  Возможно надо прокинуть лог как у тузова// err := http.ListenAndServe(":8000", nil)
+	s.router.HandleFunc("/command/save", s.handleSaveRunCommand(*s.log)) // TODO:  Возможно надо прокинуть лог как у тузова// err := http.ListenAndServe(":8000", nil)
 	// if err != nil {
 	// 	fmt.Println("Error starting server:", err)
 	// }
-	http.HandleFunc("/command/find", s.handleGetOneCommand(*s.log))
-	http.HandleFunc("/commands/all", s.handleGetListCommands(*s.log))
-	http.HandleFunc("/command/delete", s.handleDeleteCommand(*s.log))
+	s.router.HandleFunc("/command/find", s.handleGetOneCommand(*s.log))
+	s.router.HandleFunc("/commands/all", s.handleGetListCommands(*s.log))
+	s.router.HandleFunc("/command/delete", s.handleDeleteCommand(*s.log))
 
 	// s.router.HandleFunc("/users", s.handleUsersCreate()).Methods("POST")
 	// s.router.HandleFunc("/sessions", s.handleSessionsCreate()).Methods("POST")

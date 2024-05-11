@@ -3,6 +3,7 @@ package server
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
 	"io"
 	"log/slog"
 	"main/internal/lib/logger"
@@ -24,16 +25,22 @@ import (
 
 func (s *server) handleHome() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		// w.WriteHeader(205)
-		s.respond(w, 207, "req")
-		w.Write([]byte("Hello NewTestHendler"))
-		// io.WriteString(w, "Hello World")
-
+		if r.Method == http.MethodGet {
+			listCommands, err := s.storage.GetListCommands()
+			_, _ = listCommands, err
+			s.respond(w, 207, listCommands)
+			w.Write([]byte("Hello NewTestHendler"))
+		} else {
+			s.log.Error("incorrect request method, need a POST")
+			s.error(w, http.StatusMethodNotAllowed, storage.ErrMethod)
+			return
+		}
 	}
 }
 
 func (s *server) handleSaveRunCommand(log slog.Logger /*, s *server*/) http.HandlerFunc { // TODO: возможно сделать как метод сервер в начале в скобках
 	return func(w http.ResponseWriter, r *http.Request) {
+
 		if r.Method == http.MethodPost {
 			const op = "server.handleSaveRunCommand"
 
@@ -45,16 +52,14 @@ func (s *server) handleSaveRunCommand(log slog.Logger /*, s *server*/) http.Hand
 
 			err := json.NewDecoder(r.Body).Decode(&req)
 			if errors.Is(err, io.EOF) {
-				// Такую ошибку встретим, если получили запрос с пустым телом.
-				// Обработаем её отдельно
 				s.log.Error("request body is empty")
-				s.error(w, http.StatusUnprocessableEntity, err) // "empty request", возможнно добать в сообщение
+				s.error(w /*http.StatusUnprocessableEntity*/, 501, err) // "empty request", возможнно добать в сообщение
 				return
 			}
 
 			if err != nil {
 				s.log.Error("failed to decode request", sl.Err(err))
-				s.error(w, http.StatusBadRequest, err)
+				s.error(w /*http.StatusBadRequest*/, 503, err)
 				return
 			}
 
@@ -84,7 +89,7 @@ func (s *server) handleSaveRunCommand(log slog.Logger /*, s *server*/) http.Hand
 
 			if err != nil {
 				s.log.Error("failed to add command", sl.Err(err))
-				s.error(w, http.StatusUnprocessableEntity, err)
+				s.error(w /*http.StatusUnprocessableEntity*/, 501, err)
 				return
 			}
 
@@ -115,6 +120,7 @@ func (s *server) handleGetOneCommand(log slog.Logger) http.HandlerFunc {
 			if idStr != "" {
 				var err error
 				id, err = strconv.Atoi(idStr)
+				// fmt.Println(" OuUUUUUU ", idStr, " hHHHHHHH")
 				if err != nil {
 					s.log.Error("incorrect ID entered", slog.String("id: ", idStr))
 					s.error(w, http.StatusBadRequest, err)
@@ -137,16 +143,16 @@ func (s *server) handleGetOneCommand(log slog.Logger) http.HandlerFunc {
 			// s.log.Info("request body decoded", slog.Any("request", req))
 
 			req, err := s.storage.GetOneScript(id)
-
+			fmt.Println(" OuUUUUUU ", id, req, " hHHHHHHH")
 			if errors.Is(err, storage.ErrCommandNotFound) {
-				s.log.Error("command not found", slog.String("command", req.Script))
+				s.log.Error("command not found", slog.String("command id: ", idStr))
 				s.error(w, http.StatusNotFound, err)
 				return
 			}
 
 			if err != nil {
 				s.log.Error("failed to get command by id", sl.Err(err))
-				s.error(w, http.StatusUnprocessableEntity, err) //!!! or http.StatusInternalServerError
+				s.error(w /*http.StatusUnprocessableEntity*/, 502, err) //!!! or http.StatusInternalServerError
 				return
 			}
 

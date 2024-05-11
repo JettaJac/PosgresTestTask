@@ -2,6 +2,7 @@ package teststorage
 
 import (
 	// "main/internal/storage"
+	// "fmt"
 	"main/internal/model"
 	"main/internal/storage"
 	// "net/http"
@@ -32,6 +33,7 @@ func (s *Storage) SaveRunScript(req *model.Command) (int, error) {
 }
 
 func (s *Storage) GetOneScript(id int) (*model.Command, error) {
+
 	count := 0
 	req := &model.Command{
 		ID:     0,
@@ -43,9 +45,11 @@ func (s *Storage) GetOneScript(id int) (*model.Command, error) {
 		if v.ID == id {
 			req = v
 			count++
+			continue
 		}
 	}
-	if count < 0 {
+
+	if count <= 0 {
 		return nil, storage.ErrCommandNotFound
 	}
 
@@ -71,7 +75,7 @@ func (s *Storage) DeleteCommand(id int) error {
 			count++
 		}
 	}
-	if count < 0 {
+	if count <= 0 {
 		return storage.ErrCommandNotFound
 	}
 

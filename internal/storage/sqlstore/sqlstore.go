@@ -65,7 +65,7 @@ func (storage *Storage) CloseDB() {
 
 func (s *Storage) SaveRunScript(req *model.Command) (int, error) { // CreateCommand( - название может такое  ..func GetCommands
 	const op = "storage.sqlstore.SaveRunScript"
-
+	fmt.Println("yyyyyOOOOOOOOOO")
 	query := fmt.Sprintf("INSERT INTO %s (script, result) VALUES ($1, $2) RETURNING id", Table)
 	err := s.db.QueryRow(
 		query,
