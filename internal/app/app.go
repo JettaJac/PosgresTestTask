@@ -1,25 +1,19 @@
 package app
 
 import (
-	// "fmt"
-	// "fmt"
 	"log/slog"
 	"main/internal/config"
-	sl "main/internal/lib/logger"
-
+	"main/internal/lib/logger"
 	"main/internal/server"
 	"main/internal/storage/sqlstore"
 	"net/http"
 	"os"
-	// "main/internal/config"
-	// "fmt"
 )
 
 // / TODO:  Добавить гоурутину
 func Run(config *config.Config) error {
 	log := sl.SetupLogger(config.Env)
 
-	// Created BaseData
 	storage, err := sqlstore.NewDB(config.StoragePath)
 	if err != nil {
 		log.Error("failed to init storage", sl.Err(err)) // /  пока почему то не подключаеться лог/слог

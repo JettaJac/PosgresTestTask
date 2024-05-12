@@ -26,16 +26,15 @@ type Storage struct {
 	db *sql.DB
 }
 
-func NewDB(storagePath string) (*Storage, error) { // TODO:  сторыдж патх заменить на инфу из конфига
+func NewDB(storagePath string) (*Storage, error) {
 	const op = "storage.sqlstore.sqlstore.New"
 
-	db, err := sql.Open("postgres", storagePath /*"postgres://postgres:postgres@localhost:5432/postgres?sslmode=disable"*/) ///TODO: перенести в другое место
+	db, err := sql.Open("postgres", storagePath)
 	if err != nil {
 		return nil, fmt.Errorf("%s: %s", op, err)
 	}
 
 	if err := db.Ping(); err != nil {
-		// fmt.Println("yyyyy")
 		return nil, fmt.Errorf("%s: %w", op, err)
 	}
 
@@ -80,8 +79,7 @@ func (s *Storage) SaveRunScript(req *model.Command) (int, error) { // CreateComm
 	return req.ID, nil
 }
 
-// TODO: возможно сделать, чтоб отдавала команду и результат команды
-func (s *Storage) GetOneScript(id int) (*model.Command, error) { //ште можно.нужно выдает результат // нужно, чтоб по запросу из браузера отдавал ответ
+func (s *Storage) GetOneScript(id int) (*model.Command, error) {
 	const op = "storage.sqlstore.GetOneCommand"
 
 	req := &model.Command{
@@ -91,9 +89,7 @@ func (s *Storage) GetOneScript(id int) (*model.Command, error) { //ште мож
 	}
 
 	query := fmt.Sprintf("SELECT script, result FROM %s WHERE id = $1", Table)
-	err := s.db.QueryRow(
-		/*"SELECT result FROM commandsdb WHERE id = $1"*/ query, req.ID,
-	).Scan(&req.Script, &req.Result)
+	err := s.db.QueryRow(query, req.ID).Scan(&req.Script, &req.Result)
 	if err != nil {
 		return nil, fmt.Errorf("%s: %s", op, err) // !!! посмотреть как здесь создаеться ошибка Command not found, которую мы потом проверяем
 	}
@@ -121,11 +117,11 @@ func (s *Storage) GetListCommands() ([]model.Command, error) {
 	// Выполнение SQL-запроса с db.Query
 	var commands []model.Command
 	// err := s.db.Select(&commands, query) !!! проверить сработает ли
-	rows, err := s.db.Query( /*"SELECT id, script, result  FROM commandsdb"*/ query)
+	rows, err := s.db.Query(query)
 	if err != nil {
 		return nil, fmt.Errorf("%s: %s", op, err)
 	}
-	defer rows.Close() // закрывать соединение с базой данных
+	defer rows.Close()
 
 	for rows.Next() {
 		var command model.Command
@@ -167,32 +163,11 @@ func (s *Storage) GetListCommands() ([]model.Command, error) {
 	return commands, nil
 }
 
-// func (s *Storage) GetCommands(name string) (string, error) { //ште можно.нужно убрать jnlftn htpekmnfn
-// 	const op = "storage.sqlstore.GetCommands"
-// 	stmt, err := s.db.Prepare(`SELECT * FROM commands`)
-// 	if err != nil {
-// 		return "", fmt.Errorf("%s: prepare ststement: %w", op, err)
-// 	}
-// 	var result string
-// 	err = stmt.QueryRow(name).Scan(&result)
-// 	if errors.Is(err, sql.ErrNoRows) {
-// 		return "", storage.ErrURLNotFound // TODO: у  тузово по другому 47.49
-// 	}
-
-// 	if err != nil {
-// 		return "", fmt.Errorf("%s: failed to get last insert id:  %w", op, err)
-// 	}
-// 	return result, nil
-// }
-
 func (s *Storage) DeleteCommand(id int) error {
 	const op = "storage.sqlstore.DeleteCommand"
 	query := fmt.Sprintf("DELETE FROM %s WHERE id = $1", Table)
 
-	res, err := s.db.Exec(
-		/*"DELETE FROM commandsdb WHERE id = $1"*/ query,
-		id,
-	)
+	res, err := s.db.Exec(query, id)
 
 	if err != nil { // !!! не выводит пока ошибку, если такой записи нет
 		return fmt.Errorf("%s: %s", op, err)
