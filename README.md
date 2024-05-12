@@ -30,6 +30,5 @@ API-приложение предоставляет следующую функ�
  
 - go run cmd/main.go
 - make (используя Makefile)
-- docker build -t web-server . && docker run -d -p 8080:8080 web-server (используя Docker)
-docker run -d -p 80:80 docker/getting-started
+- docker-compose up --build (используя Docker)
 
