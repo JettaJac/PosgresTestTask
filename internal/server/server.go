@@ -11,6 +11,13 @@ import (
 	"log/slog"
 )
 
+var (
+	PathSave   = "/command/save"   // handleSaveRunCommand
+	PathFind   = "/command/find"   //HandleGetOneCommand
+	PathList   = "/commands/all"   // HandleGetListCommands
+	PathDelete = "/command/delete" // HandleDeleteCommand
+)
+
 type server struct {
 	router       *http.ServeMux
 	Addr         string // теоритиически можно убрать
@@ -43,18 +50,11 @@ func (s *server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 } /// скорее всего не нужно
 
 func (s *server) configureRouter() {
-	s.router.HandleFunc("/test", s.handleHome())
-
 	s.router.HandleFunc("/", s.handleHome())
-	// .Methods("POST")
-	// http.HandleFunc("command/", h.HandleSaveRunScript(s)) // TODO:  Возможно надо прокинуть лог как у тузова
-	s.router.HandleFunc("/command/save", s.handleSaveRunCommand(*s.log)) // TODO:  Возможно надо прокинуть лог как у тузова// err := http.ListenAndServe(":8000", nil)
-	// if err != nil {
-	// 	fmt.Println("Error starting server:", err)
-	// }
-	s.router.HandleFunc("/command/find", s.handleGetOneCommand(*s.log))
-	s.router.HandleFunc("/commands/all", s.handleGetListCommands(*s.log))
-	s.router.HandleFunc("/command/delete", s.handleDeleteCommand(*s.log))
+	s.router.HandleFunc(PathSave, s.handleSaveRunCommand(*s.log)) // TODO:  Возможно надо прокинуть лог как у тузова// err := http.ListenAndServe(":8000", nil)
+	s.router.HandleFunc(PathFind, s.handleGetOneCommand(*s.log))
+	s.router.HandleFunc(PathList, s.handleGetListCommands(*s.log))
+	s.router.HandleFunc(PathDelete, s.handleDeleteCommand(*s.log))
 
 	// s.router.HandleFunc("/users", s.handleUsersCreate()).Methods("POST")
 	// s.router.HandleFunc("/sessions", s.handleSessionsCreate()).Methods("POST")

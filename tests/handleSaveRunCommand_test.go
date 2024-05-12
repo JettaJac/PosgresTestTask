@@ -3,7 +3,7 @@ package tests
 import (
 	"bytes"
 	"encoding/json"
-	"main/internal/lib/logger"
+	sl "main/internal/lib/logger"
 	"main/internal/model"
 	"main/internal/server"
 	"main/internal/storage/sqlstore"
@@ -37,7 +37,6 @@ func TestServer_HandlerInccorectMetodsCreateCommand(t *testing.T) {
 			name: "incorrec method GET",
 			command: model.Command{
 				Script: "#!/bin/bash\necho \"Hello, World Test!!!\"",
-				Result: "Hello, World Test!!!",
 			},
 			metod:        "GET",
 			expectedCode: http.StatusMethodNotAllowed,
@@ -46,7 +45,6 @@ func TestServer_HandlerInccorectMetodsCreateCommand(t *testing.T) {
 			name: "incorrec method OPTIONS",
 			command: model.Command{
 				Script: "#!/bin/bash\necho \"Hello, World Test!!!\"",
-				Result: "Hello, World Test!!!",
 			},
 			metod:        "OPTIONS",
 			expectedCode: http.StatusMethodNotAllowed,
@@ -55,7 +53,6 @@ func TestServer_HandlerInccorectMetodsCreateCommand(t *testing.T) {
 			name: "incorrec method HEAD",
 			command: model.Command{
 				Script: "#!/bin/bash\necho \"Hello, World Test!!!\"",
-				Result: "Hello, World Test!!!",
 			},
 			metod:        "HEAD",
 			expectedCode: http.StatusMethodNotAllowed,
@@ -64,7 +61,6 @@ func TestServer_HandlerInccorectMetodsCreateCommand(t *testing.T) {
 			name: "incorrec method PUT",
 			command: model.Command{
 				Script: "#!/bin/bash\necho \"Hello, World Test!!!\"",
-				Result: "Hello, World Test!!!",
 			},
 			metod:        "PUT",
 			expectedCode: http.StatusMethodNotAllowed,
@@ -73,7 +69,6 @@ func TestServer_HandlerInccorectMetodsCreateCommand(t *testing.T) {
 			name: "incorrec method DELETE",
 			command: model.Command{
 				Script: "#!/bin/bash\necho \"Hello, World Test!!!\"",
-				Result: "Hello, World Test!!!",
 			},
 			metod:        "DELETE",
 			expectedCode: http.StatusMethodNotAllowed,
@@ -82,7 +77,6 @@ func TestServer_HandlerInccorectMetodsCreateCommand(t *testing.T) {
 			name: "incorrec method CONNECT",
 			command: model.Command{
 				Script: "#!/bin/bash\necho \"Hello, World Test!!!\"",
-				Result: "Hello, World Test!!!",
 			},
 			metod:        "CONNECT",
 			expectedCode: http.StatusMethodNotAllowed,
@@ -91,7 +85,6 @@ func TestServer_HandlerInccorectMetodsCreateCommand(t *testing.T) {
 			name: "incorrec method TRACE",
 			command: model.Command{
 				Script: "#!/bin/bash\necho \"Hello, World Test!!!\"",
-				Result: "Hello, World Test!!!",
 			},
 			metod:        "TRACE",
 			expectedCode: http.StatusMethodNotAllowed,
@@ -100,7 +93,6 @@ func TestServer_HandlerInccorectMetodsCreateCommand(t *testing.T) {
 			name: "incorrec method PATCH",
 			command: model.Command{
 				Script: "#!/bin/bash\necho \"Hello, World Test!!!\"",
-				Result: "Hello, World Test!!!",
 			},
 			metod:        "PATCH",
 			expectedCode: http.StatusMethodNotAllowed,
@@ -118,7 +110,7 @@ func TestServer_HandlerInccorectMetodsCreateCommand(t *testing.T) {
 			}
 
 			rec := httptest.NewRecorder()
-			req := httptest.NewRequest(tc.metod, "/command/save", b)
+			req := httptest.NewRequest(tc.metod, server.PathSave, b)
 
 			req.Header.Set("Content-Type", "application/json")
 
@@ -168,8 +160,7 @@ func TestServer_HandlerCommandCreate(t *testing.T) {
 		{
 			name: "script not correct",
 			command: model.Command{
-				Script: "not valid script",
-				Result: "Hello, World Test!!!", // !!! можно еще сделать общую проверку на то что выдает запрос, но в целом такая проврека есть
+				Script: "not valid script", // !!! можно еще сделать общую проверку на то что выдает запрос, но в целом такая проврека есть
 			},
 			expectedCode: http.StatusUnprocessableEntity,
 		},
@@ -193,7 +184,7 @@ func TestServer_HandlerCommandCreate(t *testing.T) {
 			}
 
 			rec := httptest.NewRecorder()
-			req := httptest.NewRequest(http.MethodPost, "/command/save", b)
+			req := httptest.NewRequest(http.MethodPost, server.PathSave, b)
 
 			req.Header.Set("Content-Type", "application/json")
 
@@ -221,7 +212,7 @@ func TestServer_HandlerCommandCreate_Empty(t *testing.T) {
 	}{
 
 		{
-			name:         "empty request", //сделать отдельный тест
+			name:         "empty request",
 			command:      nil,
 			expectedCode: http.StatusBadRequest,
 		},
@@ -238,7 +229,7 @@ func TestServer_HandlerCommandCreate_Empty(t *testing.T) {
 			}
 
 			rec := httptest.NewRecorder()
-			req := httptest.NewRequest(http.MethodPost, "/command/save", b)
+			req := httptest.NewRequest(http.MethodPost, server.PathSave, b)
 
 			req.Header.Set("Content-Type", "application/json")
 
