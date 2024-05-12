@@ -10,9 +10,7 @@ import (
 )
 
 type Storage struct {
-	// storage *Storage
 	Commands map[string]*model.Command
-	// Command map[string]int
 }
 
 func New() *Storage {
@@ -24,7 +22,6 @@ func New() *Storage {
 
 // Create a new command
 func (s *Storage) SaveRunScript(req *model.Command) (int, error) {
-	// req.Result = "Hello, World_Model_Test" !!!передается в тестах
 	if _, ok := s.Commands[req.Script]; !ok {
 		s.Commands[req.Script] = req
 		req.ID = len(s.Commands)
@@ -58,7 +55,7 @@ func (s *Storage) GetOneScript(id int) (*model.Command, error) {
 	return req, nil
 }
 
-func (s *Storage) GetListCommands( /*req *model.Command, w http.ResponseWriter*/ ) ([]model.Command, error) {
+func (s *Storage) GetListCommands() ([]model.Command, error) {
 	var commands []model.Command
 
 	for _, v := range s.Commands {

@@ -11,28 +11,15 @@ import (
 
 type Config struct {
 	Env         string `yaml:"env" env-default:"local"`
-	StoragePath string `yaml:"storage_path" env-required:"true"`
-	// DatabaseURL string `yaml:"database_url"` // The database URL to use TODO:  возможно прописать путь к базе данных здесь)
-	HTTPServer `yaml:"http_server"`
+	DatabaseURL string `yaml:"storage_path" env-required:"true"`
+	HTTPServer  `yaml:"http_server"`
 }
 
 type HTTPServer struct {
-	Address string        `yaml:"address" env-default:"localhost:8080"`
-	Timeout time.Duration `yaml:"timeout" env-default:"4s"`
-	// TODO:  Возможно не надо, убрать в будущем
+	Address     string        `yaml:"address" env-default:"localhost:8080"`
+	Timeout     time.Duration `yaml:"timeout" env-default:"4s"`
 	IdleTimeout time.Duration `yaml:"idle_timeout" env-default:"60s"`
 }
-
-// // NewConfig creates a new configuration
-// func NewConfig() *Config {
-// 	return &Config{
-// 		BindAddr: ":8080",
-// 		LogLevel: "debug",
-// 		// Store:    store.NewConfig(),
-// 	}
-// }
-
-// NewConfig creates a new configuration
 
 func NewConfig() *Config {
 
@@ -52,7 +39,6 @@ func NewConfig() *Config {
 	flag.StringVar(&configPath, "config-path", "configs/appConfig.yaml", "config file path")
 
 	flag.Parse()
-	fmt.Println("________")
 	configData, err := os.ReadFile(configPath)
 	if err != nil {
 		log.Fatalf("Failed to read config file: %s", err)

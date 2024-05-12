@@ -27,9 +27,6 @@ func TestMain(m *testing.M) {
 func TestCommand_CreateRun(t *testing.T) { // good  возможно тут надо сравнивать результат
 	storage, teardown := sqlstore.TestDB(t, databaseURL)
 	defer teardown(sqlstore.Table) // !!! возможно прокидываьт сюда название таблицы с которой работаем
-	// _ = teardown // !!!
-
-	// обработать ошибку
 
 	req := model.TestCommand(t)
 	req.Result = model.TestResult
@@ -43,7 +40,6 @@ func TestCommand_CreateRun(t *testing.T) { // good  возможно тут на
 func TestCommand_GetOneScript(t *testing.T) { // good  возможно тут надо сравнивать результат
 	storage, teardown := sqlstore.TestDB(t, databaseURL)
 	defer teardown(sqlstore.Table)
-	// _ = teardown // !!!
 
 	req := model.TestCommand(t)
 	req.Result = model.TestResult
@@ -51,7 +47,7 @@ func TestCommand_GetOneScript(t *testing.T) { // good  возможно тут �
 	assert.NoError(t, err)
 	assert.NotNil(t, id)
 
-	resp, err := storage.GetOneScript(id) // возможно метод должен принимать только id,  а отдавать модель
+	resp, err := storage.GetOneScript(id)
 	assert.NoError(t, err)
 	assert.NotNil(t, resp)
 	assert.Equal(t, req.Result, resp.Result)
@@ -90,10 +86,9 @@ func TestCommand_GetListCommands(t *testing.T) { // good  возможно ту�
 func TestCommand_DeleteCommand(t *testing.T) { // не записывает 2 запрос()
 	storage, teardown := sqlstore.TestDB(t, databaseURL)
 	defer teardown(sqlstore.Table)
-	// _ = teardown // !!!
 
 	err := storage.DeleteCommand(999)
-	// fmt.Println(err)
+
 	assert.Error(t, err)
 
 	req := model.TestCommand(t)

@@ -8,10 +8,3 @@ var ( //TODO: переписать пож себя названия, и нажо
 	ErrMethod          = errors.New("invalid request method") //!!!скорее всего не сюда, переместить, поправить в хендлерах
 	ErrEmptyRequest    = errors.New("empty request")
 )
-
-// type Command struct {
-//  ID       int    json:"id"
-//  Name     string json:"name"
-//  Script   string json:"script"
-//  Result   string json:"result"
-// }

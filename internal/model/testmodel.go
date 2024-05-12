@@ -13,6 +13,6 @@ var (
 func TestCommand(t *testing.T) *Command {
 	quely := fmt.Sprintf("#!/bin/bash\necho \"%s\"", TestResult)
 	return &Command{
-		Script: quely, /*"#!/bin/bash\necho \"Hello, World_Model_Test\""*/
+		Script: quely,
 	}
 }

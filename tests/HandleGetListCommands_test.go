@@ -20,7 +20,7 @@ func TestServer_HandlerInccorectMetodsGetListCommands(t *testing.T) {
 	config := testNewConfig()
 
 	// storage := teststorage.New()
-	storage, teardown := sqlstore.TestDB(t, config.StoragePath)
+	storage, teardown := sqlstore.TestDB(t, config.DatabaseURL)
 	defer teardown(sqlstore.Table)
 
 	var logs = sl.SetupLogger(config.Env)

@@ -20,7 +20,7 @@ func TestServer_HandlerInccorectMetodsCreateCommand(t *testing.T) {
 	config := testNewConfig()
 
 	storage := teststorage.New()
-	// storage, teardown := sqlstore.TestDB(t, config.StoragePath)
+	// storage, teardown := sqlstore.TestDB(t, config.DatabaseURL)
 	// defer teardown(sqlstore.Table)
 
 	var logs = sl.SetupLogger(config.Env)
@@ -126,7 +126,7 @@ func TestServer_HandlerCommandCreate(t *testing.T) {
 
 	config := testNewConfig()
 
-	storage, teardown := sqlstore.TestDB(t, config.StoragePath)
+	storage, teardown := sqlstore.TestDB(t, config.DatabaseURL)
 	defer teardown(sqlstore.Table)
 
 	var logs = sl.SetupLogger(config.Env)
@@ -199,7 +199,7 @@ func TestServer_HandlerCommandCreate(t *testing.T) {
 func TestServer_HandlerCommandCreate_Empty(t *testing.T) {
 
 	config := testNewConfig()
-	storage, teardown := sqlstore.TestDB(t, config.StoragePath)
+	storage, teardown := sqlstore.TestDB(t, config.DatabaseURL)
 	defer teardown(sqlstore.Table)
 
 	var logs = sl.SetupLogger(config.Env)

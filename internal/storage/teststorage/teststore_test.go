@@ -2,29 +2,22 @@ package teststorage_test
 
 import (
 	"fmt"
+	"github.com/stretchr/testify/assert"
 	"main/internal/model"
-
-	// "main/internal/storage"
-
 	"main/internal/storage/teststorage"
 	"testing"
-
-	"github.com/stretchr/testify/assert"
 )
 
 func TestCommand_SaveRunScript(t *testing.T) {
 
 	storage := teststorage.New()
 	req := model.TestCommand(t)
-	// resScript, _ := scripts.Run(req.Script) // возможно сразу готовое кинуть
-	// req.Result = string(resScript)
-	// c.Result = "Hello, World_Test" // TODO:  зависит от Тест модели
 	req.Result = model.TestResult
 
 	id, err := storage.SaveRunScript(req)
-	assert.NoError(t, err) //err
+	assert.NoError(t, err)
 	assert.NotNil(t, req)
-	assert.Equal(t, 1, id) //
+	assert.Equal(t, 1, id)
 	assert.Equal(t, model.TestResult, req.Result)
 }
 
@@ -40,7 +33,7 @@ func TestCommand_GetOneScript(t *testing.T) {
 	assert.NoError(t, err)
 	fmt.Println(id)
 
-	resp, err := storage.GetOneScript(id) // возможно метод должен принимать только id,  а отдавать модель
+	resp, err := storage.GetOneScript(id)
 	fmt.Println(err)
 	assert.NoError(t, err)
 	assert.NotNil(t, resp)

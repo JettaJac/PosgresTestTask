@@ -18,7 +18,7 @@ func Err(err error) slog.Attr {
 	}
 }
 
-func SetupLogger(env string) *slog.Logger { //TODO:  возможно перенести  другую папку
+func SetupLogger(env string) *slog.Logger {
 	var log *slog.Logger
 	switch env {
 	case envLocal:
