@@ -25,11 +25,13 @@ func New() *Storage {
 // Create a new command
 func (s *Storage) SaveRunScript(req *model.Command) (int, error) {
 	// req.Result = "Hello, World_Model_Test" !!!передается в тестах
+	if _, ok := s.Commands[req.Script]; !ok {
+		s.Commands[req.Script] = req
+		req.ID = len(s.Commands)
 
-	s.Commands[req.Script] = req
-	req.ID = len(s.Commands)
-
-	return req.ID, nil
+		return req.ID, nil
+	}
+	return 0, storage.ErrCommandExists
 }
 
 func (s *Storage) GetOneScript(id int) (*model.Command, error) {

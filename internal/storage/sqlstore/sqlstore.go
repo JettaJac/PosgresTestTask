@@ -11,6 +11,8 @@ import (
 	"main/internal/model"
 	// "main/internal/storage"
 
+	// "main/internal/storage"
+
 	// "github.com/golang-migrate/migrate"
 	_ "github.com/lib/pq"
 	// "net/http"
@@ -65,14 +67,15 @@ func (storage *Storage) CloseDB() {
 
 func (s *Storage) SaveRunScript(req *model.Command) (int, error) { // CreateCommand( - название может такое  ..func GetCommands
 	const op = "storage.sqlstore.SaveRunScript"
-	fmt.Println("yyyyyOOOOOOOOOO")
+	// fmt.Println("yyyyyOOOOOOOOOO")
 	query := fmt.Sprintf("INSERT INTO %s (script, result) VALUES ($1, $2) RETURNING id", Table)
 	err := s.db.QueryRow(
 		query,
 		req.Script, req.Result,
 	).Scan(&req.ID)
+	// fmt.Println(" OOUPÁÁI", err, " OOUPÁÁI")
 	if err != nil {
-		return 0, fmt.Errorf("%s: %s", op, err)
+		return 0, fmt.Errorf("%s: %s", op, err) // лог не полный !!!
 	}
 	return req.ID, nil
 }

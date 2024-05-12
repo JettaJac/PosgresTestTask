@@ -8,7 +8,7 @@ import (
 func Run(script string) ([]byte, error) { // TODO:  сделать лог, записать в него, в принципе лог возвращаеться и обрабатываеться в месте вызова
 	const op = "scripts.Run"
 	result, err := exec.Command("bash", "-c", script).Output()
-	if err != nil {
+	if err != nil || script == "" {
 		return nil, fmt.Errorf("%s: %s", op, err)
 	}
 	return result, nil

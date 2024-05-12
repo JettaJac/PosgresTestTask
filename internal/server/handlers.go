@@ -3,7 +3,6 @@ package server
 import (
 	"encoding/json"
 	"errors"
-	"fmt"
 	"io"
 	"log/slog"
 	"main/internal/lib/logger"
@@ -53,13 +52,22 @@ func (s *server) handleSaveRunCommand(log slog.Logger /*, s *server*/) http.Hand
 			err := json.NewDecoder(r.Body).Decode(&req)
 			if errors.Is(err, io.EOF) {
 				s.log.Error("request body is empty")
-				s.error(w /*http.StatusUnprocessableEntity*/, 501, err) // "empty request", возможнно добать в сообщение
+				s.error(w, http.StatusBadRequest, err) // "empty request", возможнно добать в сообщение
 				return
 			}
 
 			if err != nil {
 				s.log.Error("failed to decode request", sl.Err(err))
 				s.error(w /*http.StatusBadRequest*/, 503, err)
+				return
+			}
+			err = model.ValidateJson(req)
+			if err != nil {
+				// Обработка ошибки валидации
+				// err.(validator.ValidationErrors) содержит информацию о полях, которые не прошли валидацию
+				// Можно обработать ошибку и вывести информацию о невалидных полях
+				s.log.Error("incorrect JSON request", sl.Err(err))
+				s.error(w, http.StatusBadRequest, err)
 				return
 			}
 
@@ -71,25 +79,27 @@ func (s *server) handleSaveRunCommand(log slog.Logger /*, s *server*/) http.Hand
 			// 	Password: req.Password,
 			// }
 			resScript, err := scripts.Run(req.Script) /// TODO:  Написать тесты на эту функцию, по типу тестов бево и валидация
+			// fmt.Println("LLLLLLLLL", err, *req, "HHHHHHH")
 			if err != nil {
 				s.log.Error("failed to run command", sl.Err(err))
 				s.error(w, http.StatusUnprocessableEntity, err)
 				return
 
 			}
+			s.log.Info("command run ")     //TODO: прикрутить лог тузова и раскомментировать
 			req.Result = string(resScript) // !!! убрать стринг
 
 			id, err := s.storage.SaveRunScript(req) //TODO:  нужен интервейс, так не хорошо прокидывать напряму бд
-			if errors.Is(err, storage.ErrCommandExists) {
-				s.log.Error("command already exists", slog.String("command", req.Script))
-				s.error(w, http.StatusConflict, err)
-				return
-
-			}
+			// fmt.Println(err)
+			// if errors.Is(err, fmt.Errorf("%s: %s", "storage.SaveRunScript", storage.ErrCommandExists)) {
+			// 	s.log.Error("command already exists", slog.String("command", req.Script))
+			// 	s.error(w, http.StatusConflict, err)
+			// 	return
+			// }
 
 			if err != nil {
 				s.log.Error("failed to add command", sl.Err(err))
-				s.error(w /*http.StatusUnprocessableEntity*/, 501, err)
+				s.error(w, http.StatusBadRequest, err)
 				return
 			}
 
@@ -143,7 +153,7 @@ func (s *server) handleGetOneCommand(log slog.Logger) http.HandlerFunc {
 			// s.log.Info("request body decoded", slog.Any("request", req))
 
 			req, err := s.storage.GetOneScript(id)
-			fmt.Println(" OuUUUUUU ", id, req, " hHHHHHHH")
+			// fmt.Println(" OuUUUUUU ", id, req, " hHHHHHHH")
 			if errors.Is(err, storage.ErrCommandNotFound) {
 				s.log.Error("command not found", slog.String("command id: ", idStr))
 				s.error(w, http.StatusNotFound, err)

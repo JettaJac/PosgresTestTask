@@ -1,7 +1,8 @@
 #https://www.youtube.com/watch?v=LxJLuW5aUDQ
 
-DB_USER = jettajac
-DB_NAME = your_database_name  
+DB_USER = $(USER)
+DB_MAIN = restapi_script1 
+DB_TEST = restapi_test1 
 
 .PHONY: build
 build:
@@ -21,16 +22,18 @@ cleant:
 run: 
 	go run cmd/main.go
 
-bd: 
-	@echo "Создание базы данных $(DB_NAME)"
-	@psql -U $(DB_USER) -c "CREATE DATABASE $(DB_NAME);"
+db: 
+	@echo "Создание базы данных $(DB_MAIN)"
+	@psql -U $(DB_USER) -c "CREATE DATABASE $(DB_MAIN);"
+
+	@echo "Создание базы данных $(DB_TEST)"
+	@psql -U $(DB_USER) -c "CREATE DATABASE $(DB_TEST);"	
 
 
 .PHONY: test
 test: 
-# пока запускаем с сервера, возможно перенести в другую папку
-	cd internal/server && go test
-# -v -race -timeout 30s ./ ...
+	cd tests && go test
+#  -v -race -timeout 30s ./ ...
 
 clean:
 	rm -rf main

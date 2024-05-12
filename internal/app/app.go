@@ -2,6 +2,7 @@ package app
 
 import (
 	// "fmt"
+	// "fmt"
 	"log/slog"
 	"main/internal/config"
 	sl "main/internal/lib/logger"
@@ -35,6 +36,7 @@ func Run(config *config.Config) error {
 	_ = srv //!!!
 
 	// srv.ListenAndServe(config.Address, nil)
+	// fmt.Println("TTTTTTT", "YYYYYY")
 
-	return http.ListenAndServe(config.Address, nil)
+	return http.ListenAndServe(config.Address, srv)
 }
