@@ -11,7 +11,7 @@ import (
 	"main/internal/model"
 	// "main/internal/storage"
 
-	// "main/internal/storage"
+	// "main/internal/storage"storage.sqlstore.sqlstore.New
 
 	// "github.com/golang-migrate/migrate"
 	_ "github.com/lib/pq"

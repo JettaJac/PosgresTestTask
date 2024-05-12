@@ -12,11 +12,17 @@ COPY . /
 
 # Собираем ваш Go-проект (компилируем) с помощью команды go build и файлом main.go в корень контейнер
 # !!! возможно запускаем макфайл с новой командой
-RUN go build main.go
+RUN go build cmd/main.go 
 
 # Указываем команду, которая будет выполняться при запуске контейнера
 # Измеенить имя запускаюшего файла, например, appScript
-CMD ["./main"]
+CMD ["/main"]
 
 # Открываем порт 8080, чтобы контейнер мог принимать входящие сетевые запросы на этом порту
 EXPOSE 8080
+
+
+# docker exec -it bbddd13c01bc /bin/bash
+# apt update
+# apt install netcat-openbsd
+# install nmap-ncat
