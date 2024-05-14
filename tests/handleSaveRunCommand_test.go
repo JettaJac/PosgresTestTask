@@ -15,6 +15,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+// TestServer_HandlerInccorectMetodsCreateCommand test the correct method
 func TestServer_HandlerInccorectMetodsCreateCommand(t *testing.T) {
 
 	config := testNewConfig()
@@ -122,6 +123,7 @@ func TestServer_HandlerInccorectMetodsCreateCommand(t *testing.T) {
 
 }
 
+// TestServer_HandlerContextCreate checks the correctness of the entered data
 func TestServer_HandlerCommandCreate(t *testing.T) {
 
 	config := testNewConfig()
@@ -196,6 +198,7 @@ func TestServer_HandlerCommandCreate(t *testing.T) {
 
 }
 
+// TestServer_HandlerContextCreate check when submitting an empty request
 func TestServer_HandlerCommandCreate_Empty(t *testing.T) {
 
 	config := testNewConfig()

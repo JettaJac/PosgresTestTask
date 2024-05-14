@@ -30,5 +30,10 @@ API-приложение предоставляет следующую функ�
  
 - go run cmd/main.go
 - make (используя Makefile)
-- docker-compose up --build (используя Docker)
+- docker-compose up --build (используя Docker) 
+
+##
+## Запуск тестов
+- cd tests && go test
+- make tests (используя Makefile)
 

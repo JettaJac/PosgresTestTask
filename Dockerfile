@@ -12,7 +12,10 @@ COPY . /
 
 # Собираем ваш Go-проект (компилируем) с помощью команды go build и файлом main.go в корень контейнер
 # !!! возможно запускаем макфайл с новой командой
-RUN go build cmd/main.go 
+RUN go build cmd/main.go && \
+    apt-get update && apt-get install -y postgresql-client 
+# RUN   psql -U user -d restapi_script -f migrations/*.up.sql 
+    
 
 # Указываем команду, которая будет выполняться при запуске контейнера
 # Измеенить имя запускаюшего файла, например, appScript

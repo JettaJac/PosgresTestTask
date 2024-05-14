@@ -13,11 +13,8 @@ import (
 	"strconv"
 )
 
-// import "net/http"
-// curl -X POST -H "Content-Type: application/json" -d '{"name":"test555","script":"#!/bin/bash\necho \"Hello, World\""}' http://127.0.0.1:8080/command
-// curl -X GET "Content-Type: application/json" -d '{"id":66}' http://127.0.0.1:8080/command
-
-func (s *server) handleSaveRunCommand(log slog.Logger /*, s *server*/) http.HandlerFunc { // TODO: возможно сделать как метод сервер в начале в скобках
+// handleSaveRunCommand saves the command to the database
+func (s *server) handleSaveRunCommand(log slog.Logger) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 
 		if r.Method == http.MethodPost {
@@ -31,7 +28,7 @@ func (s *server) handleSaveRunCommand(log slog.Logger /*, s *server*/) http.Hand
 			err := json.NewDecoder(r.Body).Decode(&req)
 			if errors.Is(err, io.EOF) {
 				s.log.Error("request body is empty")
-				s.error(w, http.StatusBadRequest, err) // "empty request", возможнно добать в сообщение
+				s.error(w, http.StatusBadRequest, err)
 				return
 			}
 
@@ -42,9 +39,6 @@ func (s *server) handleSaveRunCommand(log slog.Logger /*, s *server*/) http.Hand
 			}
 			err = model.ValidateJson(req)
 			if err != nil {
-				// Обработка ошибки валидации
-				// err.(validator.ValidationErrors) содержит информацию о полях, которые не прошли валидацию
-				// Можно обработать ошибку и вывести информацию о невалидных полях
 				s.log.Error("incorrect JSON request", sl.Err(err))
 				s.error(w, http.StatusBadRequest, err)
 				return
@@ -52,12 +46,7 @@ func (s *server) handleSaveRunCommand(log slog.Logger /*, s *server*/) http.Hand
 
 			s.log.Info("request body decoded", slog.Any("request", req))
 
-			// у основного создаеться здесь еще одна структура с данными юзер и присваиваев значения с запроса
-			// u := &model.User{
-			// 	Email:    req.Email,
-			// 	Password: req.Password,
-			// }
-			resScript, err := scripts.Run(req.Script) /// TODO:  Написать тесты на эту функцию, по типу тестов бево и валидация
+			resScript, err := scripts.Run(req.Script)
 			if err != nil {
 				s.log.Error("failed to run command", sl.Err(err))
 				s.error(w, http.StatusUnprocessableEntity, err)
@@ -65,24 +54,17 @@ func (s *server) handleSaveRunCommand(log slog.Logger /*, s *server*/) http.Hand
 
 			}
 			s.log.Info("command run ")
-			req.Result = string(resScript) // !!! убрать стринг
+			req.Result = string(resScript)
 
-			id, err := s.storage.SaveRunScript(req) //TODO:  нужен интервейс, так не хорошо прокидывать напряму бд
-			// fmt.Println(err)
-			// if errors.Is(err, fmt.Errorf("%s: %s", "storage.SaveRunScript", storage.ErrCommandExists)) {
-			// 	s.log.Error("command already exists", slog.String("command", req.Script))
-			// 	s.error(w, http.StatusConflict, err)
-			// 	return
-			// }
-
+			id, err := s.storage.SaveRunCommand(req)
 			if err != nil {
 				s.log.Error("failed to add command", sl.Err(err))
 				s.error(w, http.StatusBadRequest, err)
 				return
 			}
 
-			s.log.Info("command added", slog.Int("id", id)) //TODO: прикрутить лог тузова и раскомментировать
-			s.respond(w, http.StatusCreated, req)           // она реализована у осн
+			s.log.Info("command added", slog.Int("id", id))
+			s.respond(w, http.StatusCreated, req)
 
 		} else {
 			s.log.Error("incorrect request method, need a POST")
@@ -92,6 +74,7 @@ func (s *server) handleSaveRunCommand(log slog.Logger /*, s *server*/) http.Hand
 	}
 }
 
+// / handleGetOneCommand returns one command from the database by ID
 func (s *server) handleGetOneCommand(log slog.Logger) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		if r.Method == http.MethodGet {
@@ -102,8 +85,7 @@ func (s *server) handleGetOneCommand(log slog.Logger) http.HandlerFunc {
 
 			var id int
 
-			///Запрос по id сделать
-			idStr := r.URL.Query().Get("id") // Получаем значение параметра id из URL
+			idStr := r.URL.Query().Get("id")
 
 			if idStr != "" {
 				var err error
@@ -120,7 +102,7 @@ func (s *server) handleGetOneCommand(log slog.Logger) http.HandlerFunc {
 				return
 			}
 
-			req, err := s.storage.GetOneScript(id)
+			req, err := s.storage.GetOneCommand(id)
 			if errors.Is(err, storage.ErrCommandNotFound) {
 				s.log.Error("command not found", slog.String("command id: ", idStr))
 				s.error(w, http.StatusNotFound, err)
@@ -143,6 +125,7 @@ func (s *server) handleGetOneCommand(log slog.Logger) http.HandlerFunc {
 	}
 }
 
+// // handleGetListCommands returns all commands from the database as a list
 func (s *server) handleGetListCommands(log slog.Logger) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		if r.Method == http.MethodGet {
@@ -151,7 +134,7 @@ func (s *server) handleGetListCommands(log slog.Logger) http.HandlerFunc {
 				slog.String("op", op),
 			)
 
-			listCommands, err := s.storage.GetListCommands() //TODO:  нужен интервейс, так не хорошо прокидывать напряму бд
+			listCommands, err := s.storage.GetListCommands()
 			if err != nil {
 				s.log.Error("failed to add command", sl.Err(err))
 				s.error(w, http.StatusInternalServerError, err)
@@ -168,6 +151,8 @@ func (s *server) handleGetListCommands(log slog.Logger) http.HandlerFunc {
 	}
 }
 
+// / handleDeleteCommand deletes a command from the database by ID
+// TODO: здесь можно расширить удалением по команде, по нему и удалить
 func (s *server) handleDeleteCommand(log slog.Logger) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		if r.Method == http.MethodDelete {
@@ -182,7 +167,7 @@ func (s *server) handleDeleteCommand(log slog.Logger) http.HandlerFunc {
 				Result: "",
 			}
 
-			idStr := r.URL.Query().Get("id") // Получаем значение параметра id из URL
+			idStr := r.URL.Query().Get("id")
 			if idStr != "" {
 				id, err := strconv.Atoi(idStr)
 				if err != nil {
@@ -201,25 +186,23 @@ func (s *server) handleDeleteCommand(log slog.Logger) http.HandlerFunc {
 				ID     int    `json:"id"`
 				Result string `json:"result"`
 			}
-			// !!! здесь можно расширить если параметр id или скрипт, по нему и удалить
 
-			err := s.storage.DeleteCommand(req.ID) //TODO:  нужен интервейс, так не хорошо прокидывать напряму бд
-
+			err := s.storage.DeleteCommand(req.ID)
 			if errors.Is(err, storage.ErrCommandNotFound) {
-				s.log.Error("command not found", slog.String("command", strconv.Itoa(req.ID))) /// !!! преобразовать id в стринг
+				s.log.Error("command not found", slog.String("command", idStr))
 				s.error(w, http.StatusNotFound, err)
 				return
 			}
 
 			if err != nil {
 				s.log.Error("failed to delete command by id", sl.Err(err))
-				s.error(w, http.StatusInternalServerError, err) //!!! or http.StatusInternalServerError
+				s.error(w, http.StatusInternalServerError, err)
 				return
 			}
 
 			req.Result = "script deleted"
 			s.log.Info("script deleted", slog.Int("id", req.ID))
-			s.respond(w, http.StatusOK, req) // она реализована у осн
+			s.respond(w, http.StatusOK, req)
 		} else {
 			s.log.Error("incorrect request method")
 			s.error(w, http.StatusMethodNotAllowed, storage.ErrMethod)
@@ -228,11 +211,10 @@ func (s *server) handleDeleteCommand(log slog.Logger) http.HandlerFunc {
 	}
 }
 
+// handleHome returns the home page
 func (s *server) handleHome() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		if r.Method == http.MethodGet {
-			// listCommands, err := s.storage.GetListCommands()
-			// _, _ = listCommands, err
 			s.respond(w, 200, "Начнем!!!")
 			w.Write([]byte("Hello World!"))
 		} else {

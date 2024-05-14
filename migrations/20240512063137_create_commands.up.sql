@@ -4,7 +4,3 @@ CREATE TABLE IF NOT EXISTS commandsdb (
 	script TEXT NOT NULL UNIQUE,
 	result TEXT NOT NULL);
 CREATE INDEX IF NOT EXISTS idx_script ON commandsdb(script);
-
---  убрать !!!
---SELECT * FROM commandsdb; 
---DELETE FROM commandsdb WHERE id =55

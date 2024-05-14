@@ -8,6 +8,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+// Test command model validation
 func TestCommand_Validate(t *testing.T) {
 
 	testCases := []struct {

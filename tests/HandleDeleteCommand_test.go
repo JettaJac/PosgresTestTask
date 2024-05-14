@@ -13,7 +13,9 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestServer_HandlerDeleteCommand(t *testing.T) {
+// TestServer_HandlerDeleteCommand tests the server.HandlerDeleteCommand
+// Tests method
+func TestServer_HandleInccorectMetodsrDeleteCommand(t *testing.T) {
 
 	config := testNewConfig()
 
@@ -119,6 +121,7 @@ func TestServer_HandlerDeleteCommand(t *testing.T) {
 
 }
 
+// TestServer_HandleDeleteCommand tests the correct data
 func TestServer_HandleDeleteCommand(t *testing.T) {
 
 	storage := teststorage.New()

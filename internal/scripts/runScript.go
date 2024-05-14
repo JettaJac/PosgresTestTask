@@ -5,7 +5,8 @@ import (
 	"os/exec"
 )
 
-func Run(script string) ([]byte, error) { // TODO:  сделать лог, записать в него, в принципе лог возвращаеться и обрабатываеться в месте вызова
+// Run executes a bash script
+func Run(script string) ([]byte, error) {
 	const op = "scripts.Run"
 	result, err := exec.Command("bash", "-c", script).Output()
 	if err != nil || script == "" {

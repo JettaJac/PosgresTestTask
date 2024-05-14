@@ -1,22 +1,14 @@
-#https://www.youtube.com/watch?v=LxJLuW5aUDQ
-
 DB_USER = $(USER)
 DB_MAIN = restapi_script1 
 DB_TEST = restapi_test1 
 
 .PHONY: build
 build:
-	go build -v cmd/main
+	go build -v cmd/
 
-
-#tests: build
-#	cd tests && go test -v
-cleant:
-#	pwd
-	sh /Users/jettajac/1_clean_1.sh
-	cd /Users/jettajac/Documents/Simple_GO/PosgresTestTask
-	pwd
-
+.PHONY: tests
+tests: build
+	cd tests && go test -v
 
 .PHONY: run
 run: 
@@ -29,11 +21,6 @@ db:
 	@echo "Создание базы данных $(DB_TEST)"
 	@psql -U $(DB_USER) -c "CREATE DATABASE $(DB_TEST);"	
 
-
-.PHONY: test
-test: 
-	cd tests && go test
-#  -v -race -timeout 30s ./ ...
 
 clean:
 	rm -rf main

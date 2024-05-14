@@ -15,6 +15,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+// TestServer_HandlerInccorectMetodsGetListCommands tests the correct method
 func TestServer_HandlerInccorectMetodsGetListCommands(t *testing.T) {
 
 	config := testNewConfig()
@@ -121,6 +122,7 @@ func TestServer_HandlerInccorectMetodsGetListCommands(t *testing.T) {
 
 }
 
+// TestServer_HandleGetListCommands tests the correct data
 func TestServer_HandleGetListCommands(t *testing.T) {
 
 	storage := teststorage.New()

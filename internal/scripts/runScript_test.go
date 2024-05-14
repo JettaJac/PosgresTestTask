@@ -10,6 +10,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+// TestCommand_RunCommands checking the script
 func TestCommand_RunCommands(t *testing.T) {
 
 	testCases := []struct {

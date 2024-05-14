@@ -1,13 +1,22 @@
 package storage
 
 import (
+	"errors"
 	"main/internal/model"
 )
 
+var (
+	ErrCommandExists   = errors.New("command already exists")
+	ErrCommandNotFound = errors.New("command not found")
+	ErrMethod          = errors.New("invalid request method")
+	ErrEmptyRequest    = errors.New("empty request")
+)
+
+// Storage ...
 type Storage interface { /// TODO: возможно переименновать в CommandRun
-	SaveRunScript(req *model.Command) (int, error)
-	GetOneScript(id int) (*model.Command, error) // !!!исправить везде нейминг
+	SaveRunCommand(req *model.Command) (int, error)
+	GetOneCommand(id int) (*model.Command, error) // !!!исправить везде нейминг
 	GetListCommands() ([]model.Command, error)
 	DeleteCommand(id int) error
-	// TODO: реализовать мктоды поиск и  удаление по скрипту
+	// TODO: реализовать методы поиск и  удаление по скрипту
 }

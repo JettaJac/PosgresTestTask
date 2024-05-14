@@ -1,20 +1,5 @@
 package main
 
-// TODO:
-// тестирование
-// развертование
-// паралелльный запуск
-// почистить код
-// Документацию
-//  инициализировать гит репозиторий
-// +? убрать name
-// Gorm
-// написать комментарии к каждой функции
-// Проверить все !!!
-// Переименновать RunScript
-//возможно стоить прокидывать имя таблице, в которой делаются изменения)б либо прописать ее в конфиге
-
-// TODO:  MacOS указать в документации
 import (
 	"log/slog"
 	"main/internal/app"
@@ -35,13 +20,14 @@ const (
 	envProd  = "prod"
 )
 
+// Main function
 func main() {
 	config := config.NewConfig()
 	log := sl.SetupLogger(config.Env)
 	log.Info("Start app", slog.String("env", config.Env), slog.String("version", "1.0"))
 	log.Debug("debug messages are enabled")
 
-	if err := app.Run(config); err != nil { // сделать на Run
+	if err := app.Run(config); err != nil {
 		log.Error("failed to start server")
 	}
 

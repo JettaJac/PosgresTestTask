@@ -5,14 +5,15 @@ import (
 	"github.com/go-playground/validator/v10"
 )
 
-// Command ... //TODO: возможно стелать как в осн , черезе репозиторий интерфейс В2-15.30
+// Command struct
 type Command struct {
 	ID     int    `json:"id" db:"id"`
 	Script string `json:"script" db:"script" validate:"required"` // возможно прикрутить валидацию
 	Result string `json:"result" db:"result"`
-	// TODO:   если успею прикрутить авторизацию /юзера и пароль
+	// TODO:    авторизациz юзера и пароль
 }
 
+// ValidateJson validates json
 func ValidateJson(req *Command) error {
 
 	const op = "server.ValidateJson"

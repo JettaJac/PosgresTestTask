@@ -1,5 +1,7 @@
 env: "local" #local, dev, prod 
-storage_path: "host=localhost dbname=restapi_script sslmode=disable"
+#databaseURL: "postgres://user:password@db:5432/restapi_script?sslmode=disable"
+# databaseURL: "host=db dbname=restapi_script  sslmode=disable user=user password=password"
+databaseURL: "host=localhost dbname=restapi_script  sslmode=disable"
 http_server:
   address: "localhost:8080"
   timeout: 4s 

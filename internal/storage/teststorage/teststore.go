@@ -1,27 +1,23 @@
 package teststorage
 
 import (
-	// "main/internal/storage"
-	// "fmt"
 	"main/internal/model"
 	"main/internal/storage"
-	// "net/http"
-	// "fmt"
 )
 
 type Storage struct {
 	Commands map[string]*model.Command
 }
 
+// New reate a new storage
 func New() *Storage {
 	return &Storage{
-		// Command: make(map[string]int),
 		Commands: make(map[string]*model.Command),
 	}
 }
 
-// Create a new command
-func (s *Storage) SaveRunScript(req *model.Command) (int, error) {
+// SaveRunCommand create a new command
+func (s *Storage) SaveRunCommand(req *model.Command) (int, error) {
 	if _, ok := s.Commands[req.Script]; !ok {
 		s.Commands[req.Script] = req
 		req.ID = len(s.Commands)
@@ -31,7 +27,8 @@ func (s *Storage) SaveRunScript(req *model.Command) (int, error) {
 	return 0, storage.ErrCommandExists
 }
 
-func (s *Storage) GetOneScript(id int) (*model.Command, error) {
+// / GetOneCommand get one command from storage by ID
+func (s *Storage) GetOneCommand(id int) (*model.Command, error) {
 
 	count := 0
 	req := &model.Command{
@@ -55,6 +52,7 @@ func (s *Storage) GetOneScript(id int) (*model.Command, error) {
 	return req, nil
 }
 
+// GetListCommands get all commands from storage
 func (s *Storage) GetListCommands() ([]model.Command, error) {
 	var commands []model.Command
 
@@ -65,6 +63,7 @@ func (s *Storage) GetListCommands() ([]model.Command, error) {
 	return commands, nil
 }
 
+// DeleteCommand delete a command from storage by ID
 func (s *Storage) DeleteCommand(id int) error {
 	count := 0
 	for _, v := range s.Commands {

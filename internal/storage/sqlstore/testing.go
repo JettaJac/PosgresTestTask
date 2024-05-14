@@ -8,6 +8,7 @@ import (
 	"testing"
 )
 
+// TestDB creates a test database with the given name and runs the given
 func TestDB(t *testing.T, databaseURL string) (*Storage, func(...string)) {
 	t.Helper()
 	db, err := sql.Open("postgres", databaseURL)

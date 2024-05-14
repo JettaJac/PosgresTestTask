@@ -16,6 +16,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+// TestServer_HandlerInccorectGetOneCommand test the correct method
 func TestServer_HandlerInccorectGetOneCommand(t *testing.T) {
 
 	config := testNewConfig()
@@ -122,6 +123,7 @@ func TestServer_HandlerInccorectGetOneCommand(t *testing.T) {
 
 }
 
+// TestServer_HandleGetOneCommand test the correct data
 func TestServer_HandleGetOneCommand(t *testing.T) {
 
 	storage := teststorage.New()

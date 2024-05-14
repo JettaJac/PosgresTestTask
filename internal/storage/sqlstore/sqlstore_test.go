@@ -15,6 +15,7 @@ var (
 	databaseURL string
 )
 
+// TestMain is a helper function to setup the test database
 func TestMain(m *testing.M) {
 	databaseURL = os.Getenv("DATABASE_URL")
 	if databaseURL == "" {
@@ -24,66 +25,79 @@ func TestMain(m *testing.M) {
 	os.Exit(m.Run())
 }
 
-func TestCommand_CreateRun(t *testing.T) { // good  возможно тут надо сравнивать результат
-	storage, teardown := sqlstore.TestDB(t, databaseURL)
-	defer teardown(sqlstore.Table) // !!! возможно прокидываьт сюда название таблицы с которой работаем
-
-	req := model.TestCommand(t)
-	req.Result = model.TestResult
-	id, err := storage.SaveRunScript(req)
-	assert.NoError(t, err)
-	assert.NotNil(t, id)
-	assert.NotNil(t, req)
-	assert.Equal(t, model.TestResult, req.Result) // проверяем, что мы не потеряли результат
-}
-
-func TestCommand_GetOneScript(t *testing.T) { // good  возможно тут надо сравнивать результат
+// TestCommand_CreateRun tests creating a new command
+func TestCommand_CreateRun(t *testing.T) {
 	storage, teardown := sqlstore.TestDB(t, databaseURL)
 	defer teardown(sqlstore.Table)
 
 	req := model.TestCommand(t)
 	req.Result = model.TestResult
-	id, err := storage.SaveRunScript(req)
+	id, err := storage.SaveRunCommand(req)
+	assert.NoError(t, err)
+	assert.NotNil(t, id)
+	assert.NotNil(t, req)
+	assert.Equal(t, model.TestResult, req.Result)
+}
+
+// TestCommand_GetOneCommand tests getting a single command by ID
+func TestCommand_GetOneCommand(t *testing.T) {
+	storage, teardown := sqlstore.TestDB(t, databaseURL)
+	defer teardown(sqlstore.Table)
+
+	req := model.TestCommand(t)
+	req.Result = model.TestResult
+	id, err := storage.SaveRunCommand(req)
 	assert.NoError(t, err)
 	assert.NotNil(t, id)
 
-	resp, err := storage.GetOneScript(id)
+	resp, err := storage.GetOneCommand(id)
 	assert.NoError(t, err)
 	assert.NotNil(t, resp)
 	assert.Equal(t, req.Result, resp.Result)
 
-	resp, err = storage.GetOneScript(999)
+	resp, err = storage.GetOneCommand(999)
 	assert.Error(t, err)
 	assert.Nil(t, resp)
 
 }
 
-// тест на пустой список, !!!
-func TestCommand_GetListCommands(t *testing.T) { // good  возможно тут надо сравнивать результат
+// / TestCommand_GetListCommands tests getting a list of commands by ID
+func TestCommand_GetListCommands(t *testing.T) {
 	storage, teardown := sqlstore.TestDB(t, databaseURL)
 	defer teardown(sqlstore.Table)
 
+	resp, err := storage.GetListCommands()
+	assert.NoError(t, err)
+	assert.Nil(t, resp)
+	assert.Equal(t, 0, len(resp))
+
 	req := model.TestCommand(t)
 	req.Result = model.TestResult
-	_, err := storage.SaveRunScript(req)
+	_, err = storage.SaveRunCommand(req)
 	assert.NoError(t, err)
 	assert.NotNil(t, req.ID)
+
+	resp, err = storage.GetListCommands()
+	assert.NoError(t, err)
+	assert.NotNil(t, resp)
+	assert.Equal(t, 1, len(resp))
 
 	req2 := model.TestCommand(t)
 	req2.Script = req.Script + "2"
 	req2.Result = model.TestResult + "2"
-	_, err = storage.SaveRunScript(req2)
+	_, err = storage.SaveRunCommand(req2)
 	assert.NoError(t, err)
 	assert.NotNil(t, req.ID)
 	assert.Equal(t, req.ID+1, req2.ID)
 
-	resp, err := storage.GetListCommands()
+	resp, err = storage.GetListCommands()
 	assert.NoError(t, err)
 	assert.NotNil(t, resp)
 	assert.Equal(t, 2, len(resp))
 }
 
-func TestCommand_DeleteCommand(t *testing.T) { // не записывает 2 запрос()
+// TestCommand_DeleteCommand tests deleting a command by ID
+func TestCommand_DeleteCommand(t *testing.T) {
 	storage, teardown := sqlstore.TestDB(t, databaseURL)
 	defer teardown(sqlstore.Table)
 
@@ -93,33 +107,30 @@ func TestCommand_DeleteCommand(t *testing.T) { // не записывает 2 з
 
 	req := model.TestCommand(t)
 	req.Result = model.TestResult
-	_, err = storage.SaveRunScript(req)
+	_, err = storage.SaveRunCommand(req)
 	assert.NoError(t, err)
 	assert.NotNil(t, req.ID)
 
 	req2 := model.TestCommand(t)
 	req2.Script = "test"
 	req2.Result = model.TestResult + "2"
-	id, err := storage.SaveRunScript(req2)
+	id, err := storage.SaveRunCommand(req2)
 	assert.NoError(t, err)
 	assert.NotNil(t, req2.ID)
 	assert.Equal(t, req.ID+1, req2.ID)
 	fmt.Println(id)
 
-	resp, err := storage.GetOneScript(id)
+	resp, err := storage.GetOneCommand(id)
 	assert.NotNil(t, resp)
 
 	err = storage.DeleteCommand(id)
 	assert.NoError(t, err)
-	// assert.Nil(t, req2)
 
-	resp, err = storage.GetOneScript(id)
+	resp, err = storage.GetOneCommand(id)
+	assert.Error(t, err)
 	assert.Nil(t, resp)
-	// assert.Equal(t, 2, len(resp))
 
 	err = storage.DeleteCommand(999)
-	// fmt.Println(err)
 	assert.Error(t, err)
-
-	// assert.Equal(t, err, store.ErrCommandNotFound)
+	assert.Nil(t, resp)
 }

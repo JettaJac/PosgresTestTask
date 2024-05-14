@@ -10,6 +10,7 @@ import (
 	"os"
 )
 
+// Run starts the application
 func Run(config *config.Config) error {
 	log := sl.SetupLogger(config.Env)
 
@@ -19,7 +20,7 @@ func Run(config *config.Config) error {
 		os.Exit(1)
 	}
 	log.Info("Сonnected to the database", slog.String("env", config.Env))
-	defer storage.CloseDB() /// TODO:  Возможно сделать без вызова доп функции, а сразу закрыть здесь
+	defer storage.CloseDB()
 
 	// Created server
 	srv := server.NewServer(config, storage, log)

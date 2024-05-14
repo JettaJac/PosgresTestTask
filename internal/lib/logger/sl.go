@@ -11,6 +11,7 @@ const (
 	envProd  = "prod"
 )
 
+// Err returns an slog.Attr with key "error" and value err.Error()
 func Err(err error) slog.Attr {
 	return slog.Attr{
 		Key:   "error",
@@ -18,6 +19,7 @@ func Err(err error) slog.Attr {
 	}
 }
 
+// / SetupLogger sets up a logger for the given environment
 func SetupLogger(env string) *slog.Logger {
 	var log *slog.Logger
 	switch env {
