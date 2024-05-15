@@ -8,10 +8,12 @@ services:
         LOCAL: "true"
     ports:
       - "8080:8080"
-    depends_on:
+    depends_on:    
       - db
+    links:
+      - db 
     environment:
-      - DATABASE_URL=postgres://user:password@db:5432/restapi_script
+      - DATABASE_URL=postgres://user:password@db:5432/restapi_script ,restapi_test
     networks:
       - enrollment
     
@@ -20,6 +22,7 @@ services:
     image: postgres:latest
     environment:
       - POSTGRES_DB=restapi_script
+      # - POSTGRES_DB=restapi_test
       - POSTGRES_USER=user
       - POSTGRES_PASSWORD=password
     networks:
@@ -34,3 +37,7 @@ volumes:
 networks:
   enrollment:
     driver: bridge   
+
+
+#   psql -U  user -d restapi_script && \l
+#  psql -u  user -d restapi_script \dt
