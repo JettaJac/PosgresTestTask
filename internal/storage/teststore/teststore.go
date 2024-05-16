@@ -1,4 +1,4 @@
-package teststorage
+package teststore
 
 import (
 	"main/internal/model"

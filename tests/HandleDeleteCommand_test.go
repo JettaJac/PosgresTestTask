@@ -5,7 +5,7 @@ import (
 	sl "main/internal/lib/logger"
 	"main/internal/model"
 	"main/internal/server"
-	"main/internal/storage/teststorage"
+	"main/internal/storage/teststore"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -19,7 +19,7 @@ func TestServer_HandleInccorectMetodsrDeleteCommand(t *testing.T) {
 
 	config := testNewConfig()
 
-	storage := teststorage.New()
+	storage := teststore.New()
 	// storage, teardown := sqlstore.TestDB(t, config.StoragePath)
 	// defer teardown(sqlstore.Table)
 
@@ -124,7 +124,7 @@ func TestServer_HandleInccorectMetodsrDeleteCommand(t *testing.T) {
 // TestServer_HandleDeleteCommand tests the correct data
 func TestServer_HandleDeleteCommand(t *testing.T) {
 
-	storage := teststorage.New()
+	storage := teststore.New()
 	config := testNewConfig()
 	var logs = sl.SetupLogger(config.Env)
 	s := server.NewServer(config, storage, logs)

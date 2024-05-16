@@ -1,9 +1,8 @@
-package teststorage_test
+package teststore_test
 
 import (
-	"fmt"
 	"main/internal/model"
-	"main/internal/storage/teststorage"
+	"main/internal/storage/teststore"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -14,7 +13,7 @@ import (
 // TestCommand_SaveRunCommand ...
 func TestCommand_SaveRunCommand(t *testing.T) {
 
-	storage := teststorage.New()
+	storage := teststore.New()
 	req := model.TestCommand(t)
 	req.Result = model.TestResult
 
@@ -28,18 +27,14 @@ func TestCommand_SaveRunCommand(t *testing.T) {
 // TestCommand_GetOneCommand...
 func TestCommand_GetOneCommand(t *testing.T) {
 
-	storage := teststorage.New()
+	storage := teststore.New()
 	req := model.TestCommand(t)
-	// resScript, _ := scripts.Run(req.Script)
-	// req.Result = string(resScript)
 	req.Result = model.TestResult
 
 	id, err := storage.SaveRunCommand(req)
 	assert.NoError(t, err)
-	fmt.Println(id)
 
 	resp, err := storage.GetOneCommand(id)
-	fmt.Println(err)
 	assert.NoError(t, err)
 	assert.NotNil(t, resp)
 	assert.Equal(t, 1, resp.ID)
@@ -47,12 +42,12 @@ func TestCommand_GetOneCommand(t *testing.T) {
 
 	resp, err = storage.GetOneCommand(999)
 	assert.Error(t, err)
-	assert.Nil(t, resp) //пока не проходит
+	assert.Nil(t, resp)
 }
 
 // TestCommand_GetListCommands...
 func TestCommand_GetListCommands(t *testing.T) { //тест на пустой список,
-	storage := teststorage.New()
+	storage := teststore.New()
 	req := model.TestCommand(t)
 
 	req.Result = model.TestResult
@@ -78,7 +73,7 @@ func TestCommand_GetListCommands(t *testing.T) { //тест на пустой с
 
 // / TestCommand_DeleteCommand...
 func TestCommand_DeleteCommand(t *testing.T) { // не записывает 2 запрос()
-	storage := teststorage.New()
+	storage := teststore.New()
 
 	req := model.TestCommand(t)
 	req.Result = model.TestResult

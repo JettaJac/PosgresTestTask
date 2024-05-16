@@ -6,8 +6,8 @@ import (
 	sl "main/internal/lib/logger"
 	"main/internal/model"
 	"main/internal/server"
-	"main/internal/storage/sqlstore"
-	"main/internal/storage/teststorage"
+	// "main/internal/storage/sqlstore"
+	"main/internal/storage/teststore"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -20,9 +20,9 @@ func TestServer_HandlerInccorectMetodsGetListCommands(t *testing.T) {
 
 	config := testNewConfig()
 
-	// storage := teststorage.New()
-	storage, teardown := sqlstore.TestDB(t, config.DatabaseURL)
-	defer teardown(sqlstore.Table)
+	storage := teststore.New()
+	// storage, teardown := sqlstore.TestDB(t, config.DatabaseURL)
+	// defer teardown(sqlstore.Table)
 
 	var logs = sl.SetupLogger(config.Env)
 	s := server.NewServer(config, storage, logs)
@@ -125,7 +125,7 @@ func TestServer_HandlerInccorectMetodsGetListCommands(t *testing.T) {
 // TestServer_HandleGetListCommands tests the correct data
 func TestServer_HandleGetListCommands(t *testing.T) {
 
-	storage := teststorage.New()
+	storage := teststore.New()
 	// storage, teardown := sqlstore.TestDB(t, config.StoragePath)
 	// defer teardown(sqlstore.Table)
 

@@ -7,13 +7,17 @@ import (
 	"os"
 	"time"
 
+	"github.com/caarlos0/env/v6"
 	"gopkg.in/yaml.v3"
 )
 
 type Config struct {
-	Env         string `yaml:"env" env-default:"local"`
-	DatabaseURL string `yaml:"databaseURL" env-required:"true"`
-	HTTPServer  `yaml:"http_server"`
+	Env          string `yaml:"env" env-default:"local"`
+	AuthBase     string `yaml:"authbase" env-default:"user:password@"`
+	NameDataBase string `yaml:"namebase" env-default:"restapi_script"`
+	Flags        string `yaml:"flags" env-default:"sslmode=disable"`
+	DatabaseURL  string `yaml:"databaseURL" env:"DATABASE_HOST" env-default:"localhost" env-required:"true"`
+	HTTPServer   `yaml:"http_server"`
 }
 
 type HTTPServer struct {
@@ -35,11 +39,21 @@ func NewConfig() *Config {
 	}
 
 	var config Config
-	fmt.Println(string(configData))
+
 	err = yaml.Unmarshal(configData, &config)
 	if err != nil {
 		log.Fatalf("Error parsing YAML configuration data %v", err)
 	}
+
+	if err := env.Parse(&config); err != nil {
+		log.Fatalf("Error parsing environment variables %v", err)
+	}
+
+	if os.Getenv("DATABASE_HOST") == "localhost" {
+		config.AuthBase = ""
+	}
+	config.DatabaseURL = fmt.Sprintf("postgres://%s@%s:5432/%s?%s", config.AuthBase, os.Getenv("DATABASE_HOST"), config.NameDataBase, config.Flags)
+	// fmt.Println("HHHHH", config.DatabaseURL)
 
 	return &config
 }

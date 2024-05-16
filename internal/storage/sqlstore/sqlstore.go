@@ -5,9 +5,19 @@ package sqlstore
 
 import (
 	"database/sql"
+	"errors"
 	"fmt"
 	_ "github.com/lib/pq"
 	"main/internal/model"
+
+	"log"
+
+	"github.com/golang-migrate/migrate/v4"
+	_ "github.com/golang-migrate/migrate/v4/database/postgres"
+	_ "github.com/golang-migrate/migrate/v4/source/file"
+	//	github.com/golang-migrate/migrate v3.5.4+incompatible h1:R7OzwvCJTCgwapPCiX6DyBiu2czIUMDCB118gFTKTUA=
+	//
+	// github.com/golang-migrate/migrate v3.5.4+incompatible/go.mod h1:IsVUlFN5puWOmXrqjgGUfIRIbU7mr8oNBE2tyERd9Wk=
 )
 
 var (
@@ -31,6 +41,8 @@ func NewDB(storagePath string) (*Storage, error) {
 		return nil, fmt.Errorf("%s: %w", op, err)
 	}
 
+	migrations(storagePath)
+
 	return &Storage{db}, nil
 }
 
@@ -39,20 +51,26 @@ func (storage *Storage) CloseDB() {
 	storage.db.Close()
 }
 
-// SaveCommand save command to database
-func (s *Storage) SaveRunCommand(req *model.Command) (int, error) { // CreateCommand( - название может такое  ..func GetCommands
-	const op = "storage.sqlstore.SaveRunCommand"
-	query := fmt.Sprintf("INSERT INTO %s (script, result) VALUES ($1, $2) RETURNING id", Table)
-	err := s.db.QueryRow(
-		query,
-		req.Script, req.Result,
-	).Scan(&req.ID)
-
+// migrations create migrations
+func migrations(host string) {
+	// env := ""
+	// if host == "db" {
+	// 	env = "user:password"
+	// }
+	// qualy := fmt.Sprintf("postgres://%s@localhost:5432/%s?sslmode=disable", env, host)
+	fmt.Printf(host)
+	qualy := host // !!!
+	m, err := migrate.New(
+		"file://../../../migrations",
+		qualy)
 	if err != nil {
-		return 0, fmt.Errorf("%s: %s", op, err)
+		log.Fatal(err)
 	}
+	err = m.Up()
 
-	return req.ID, nil
+	if errors.Is(err, errors.New("no change")) && err != nil {
+		log.Fatal(err)
+	}
 }
 
 // GetOneCommand get command by id from database
@@ -73,6 +91,22 @@ func (s *Storage) GetOneCommand(id int) (*model.Command, error) {
 	}
 
 	return req, nil
+}
+
+// SaveCommand save command to database
+func (s *Storage) SaveRunCommand(req *model.Command) (int, error) { // CreateCommand( - название может такое  ..func GetCommands
+	const op = "storage.sqlstore.SaveRunCommand"
+	query := fmt.Sprintf("INSERT INTO %s (script, result) VALUES ($1, $2) RETURNING id", Table)
+	err := s.db.QueryRow(
+		query,
+		req.Script, req.Result,
+	).Scan(&req.ID)
+
+	if err != nil {
+		return 0, fmt.Errorf("%s: %s", op, err)
+	}
+
+	return req.ID, nil
 }
 
 // GetListCommands get commands from database

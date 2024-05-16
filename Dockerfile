@@ -12,12 +12,11 @@ COPY . /
 #/usr/src/appScript
 
 # mkdir -p /usr/src/appScript &&
+ENV DATABASE_HOST=db
+
 # Собираем ваш Go-проект (компилируем) с помощью команды go build и файлом main.go в корень контейнер
 RUN apt-get update && go build -o main /cmd && \
-    apt-get update && apt-get install -y postgresql-client nano
-
-# RUN  service postgresql start &&  psql -U user -d restapi_script -f migrations/*.up.sql 
-    
+    apt-get update && apt-get install -y postgresql-client nano 
 
 # Указываем команду, которая будет выполняться при запуске контейнера
 # Измеенить имя запускаюшего файла, например, appScript
@@ -27,7 +26,9 @@ CMD ["./main"]
 EXPOSE 8080
 
 
-# docker exec -it bbddd13c01bc /bin/bash
+# docker exec -it app /bin/bash
 # apt update
 # apt install netcat-openbsd
 # install nmap-ncat
+# psql -U user -d restapi_script && \dt \l
+

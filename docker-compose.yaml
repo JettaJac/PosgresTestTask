@@ -1,4 +1,4 @@
-version: '3'
+version: '3.9'
 services:
   app:
     container_name: app
@@ -13,7 +13,9 @@ services:
     links:
       - db 
     environment:
-      - DATABASE_URL=postgres://user:password@db:5432/restapi_script ,restapi_test
+      - DATABASE_URL=postgres://user:password@db:5432/restapi_test
+      - DATABASE_URL_TESR=postgres://user:password@db:5432/restapi_script
+
     networks:
       - enrollment
     
@@ -21,8 +23,8 @@ services:
     container_name: db
     image: postgres:latest
     environment:
+      - POSTGRES_DB=restapi_test
       - POSTGRES_DB=restapi_script
-      # - POSTGRES_DB=restapi_test
       - POSTGRES_USER=user
       - POSTGRES_PASSWORD=password
     networks:
@@ -39,5 +41,5 @@ networks:
     driver: bridge   
 
 
-#   psql -U  user -d restapi_script && \l
-#  psql -u  user -d restapi_script \dt
+#   psql -U  user -d restapi_script 
+#  \l \dt

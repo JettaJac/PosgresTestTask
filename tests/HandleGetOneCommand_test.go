@@ -8,7 +8,7 @@ import (
 	"main/internal/server"
 
 	// "main/internal/storage/sqlstore"
-	"main/internal/storage/teststorage"
+	"main/internal/storage/teststore"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -21,7 +21,7 @@ func TestServer_HandlerInccorectGetOneCommand(t *testing.T) {
 
 	config := testNewConfig()
 
-	storage := teststorage.New()
+	storage := teststore.New()
 	// storage, teardown := sqlstore.TestDB(t, config.StoragePath)
 	// defer teardown(sqlstore.Table)
 
@@ -126,7 +126,7 @@ func TestServer_HandlerInccorectGetOneCommand(t *testing.T) {
 // TestServer_HandleGetOneCommand test the correct data
 func TestServer_HandleGetOneCommand(t *testing.T) {
 
-	storage := teststorage.New()
+	storage := teststore.New()
 
 	// storage, teardown := sqlstore.TestDB(t, config.StoragePath)
 	// defer teardown(sqlstore.Table)
