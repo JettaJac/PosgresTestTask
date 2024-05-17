@@ -8,12 +8,14 @@ import (
 	"main/internal/storage/sqlstore"
 	"net/http"
 	"os"
+	// "fmt"
 )
 
 // Run starts the application
 func Run(config *config.Config) error {
 	log := sl.SetupLogger(config.Env)
-
+	// fmt.Println("//////", config.DatabaseURL, " ////// ")
+	// config.DatabaseURL = "postgres://localhost:5432/restapi_script?sslmode=disable"
 	storage, err := sqlstore.NewDB(config.DatabaseURL)
 	if err != nil {
 		log.Error("failed to init storage", sl.Err(err))

@@ -15,7 +15,9 @@ COPY . /
 ENV DATABASE_HOST=db
 
 # Собираем ваш Go-проект (компилируем) с помощью команды go build и файлом main.go в корень контейнер
-RUN apt-get update && go build -o main /cmd && \
+RUN apt-get update && \
+    make build && \
+    # go build -o main /cmd && \
     apt-get update && apt-get install -y postgresql-client nano 
 
 # Указываем команду, которая будет выполняться при запуске контейнера

@@ -5,7 +5,7 @@ package tests
 import (
 	"bytes"
 	"encoding/json"
-	sl "main/internal/lib/logger"
+	"main/internal/lib/logger"
 	"main/internal/model"
 	"main/internal/server"
 	// "main/internal/storage/sqlstore"

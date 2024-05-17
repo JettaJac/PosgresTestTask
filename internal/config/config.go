@@ -53,7 +53,7 @@ func NewConfig() *Config {
 		config.AuthBase = ""
 	}
 	config.DatabaseURL = fmt.Sprintf("postgres://%s@%s:5432/%s?%s", config.AuthBase, os.Getenv("DATABASE_HOST"), config.NameDataBase, config.Flags)
-	// fmt.Println("HHHHH", config.DatabaseURL)
+	fmt.Println("HHHHH", config.DatabaseURL, os.Getenv("DATABASE_HOST"))
 
 	return &config
 }

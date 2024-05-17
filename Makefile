@@ -3,20 +3,33 @@ DB_MAIN = restapi_script
 DB_TEST = restapi_test
 DATABASE_HOST=localhost
 
-
+ifeq ($(env),local)
+    DATABASE_HOST=localhost
+endif
+ifeq ($(env),dev)
+    DATABASE_HOST=db
+endif
+ifeq ($(env),prod)
+    DATABASE_HOST=prod-host
+endif
+	
 
 build:
-	go build -v cmd/
+	chmod 777 init-scripts/create_db.sh
+	cd ..
+
+	DATABASE_HOST=${DATABASE_HOST} go build -v cmd/main.go
 
 tests: build
 	cd tests && go test -v
 
-testall: tests	
+testsall: tests	
 		cd internal/storage/sqlstore && go test
 		cd internal/storage/teststore && go test
 
 run: 
-	go run cmd/main.go
+	# echo $(env) 
+	DATABASE_HOST=${DATABASE_HOST} go run cmd/main.go
 
 db: 
 	@echo "Создание базы данных $(DB_MAIN)"

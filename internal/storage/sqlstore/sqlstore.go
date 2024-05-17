@@ -7,14 +7,12 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
-	_ "github.com/lib/pq"
-	"main/internal/model"
-
-	"log"
-
 	"github.com/golang-migrate/migrate/v4"
 	_ "github.com/golang-migrate/migrate/v4/database/postgres"
 	_ "github.com/golang-migrate/migrate/v4/source/file"
+	_ "github.com/lib/pq"
+	"log"
+	"main/internal/model"
 	//	github.com/golang-migrate/migrate v3.5.4+incompatible h1:R7OzwvCJTCgwapPCiX6DyBiu2czIUMDCB118gFTKTUA=
 	//
 	// github.com/golang-migrate/migrate v3.5.4+incompatible/go.mod h1:IsVUlFN5puWOmXrqjgGUfIRIbU7mr8oNBE2tyERd9Wk=
@@ -41,7 +39,7 @@ func NewDB(storagePath string) (*Storage, error) {
 		return nil, fmt.Errorf("%s: %w", op, err)
 	}
 
-	migrations(storagePath)
+	migrations(storagePath, ".")
 
 	return &Storage{db}, nil
 }
@@ -52,17 +50,9 @@ func (storage *Storage) CloseDB() {
 }
 
 // migrations create migrations
-func migrations(host string) {
-	// env := ""
-	// if host == "db" {
-	// 	env = "user:password"
-	// }
-	// qualy := fmt.Sprintf("postgres://%s@localhost:5432/%s?sslmode=disable", env, host)
-	fmt.Printf(host)
-	qualy := host // !!!
-	m, err := migrate.New(
-		"file://../../../migrations",
-		qualy)
+func migrations(host, path string) {
+	qualy := fmt.Sprintf("file://%s/migrations", path)
+	m, err := migrate.New(qualy, host)
 	if err != nil {
 		log.Fatal(err)
 	}

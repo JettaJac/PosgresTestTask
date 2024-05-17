@@ -24,7 +24,7 @@ func TestDB(t *testing.T, databaseURL string) (*Storage, func(...string)) {
 		return nil, nil
 	}
 
-	migrations(databaseURL)
+	migrations(databaseURL, "../../..")
 
 	return &Storage{db}, func(tables ...string) {
 		if len(tables) > 0 {

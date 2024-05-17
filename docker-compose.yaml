@@ -13,8 +13,7 @@ services:
     links:
       - db 
     environment:
-      - DATABASE_URL=postgres://user:password@db:5432/restapi_test
-      - DATABASE_URL_TESR=postgres://user:password@db:5432/restapi_script
+      - DATABASE_URL=postgres://user:password@db:5432/restapi_script
 
     networks:
       - enrollment
@@ -23,23 +22,24 @@ services:
     container_name: db
     image: postgres:latest
     environment:
-      - POSTGRES_DB=restapi_test
-      - POSTGRES_DB=restapi_script
+      - POSTGRES_DB=restapi_script   
       - POSTGRES_USER=user
       - POSTGRES_PASSWORD=password
     networks:
       - enrollment  
 
-  #  volumes:
-   #   - db-data:/var/lib/postgresql/data2
+    volumes:
+      - ./init-scripts:/docker-entrypoint-initdb.d #либо для теста создавать 2 контейнер с БД
+   #   - db-data:/var/lib/postgresql/data2 # Для хранения БД на локальной машине
 
 volumes:
   db-data:
 
+#не обязательно
 networks:
   enrollment:
     driver: bridge   
 
 
-#   psql -U  user -d restapi_script 
+#   psql -U  user -d restapi_script -c "CREATE DATABASE restapi_test;"
 #  \l \dt

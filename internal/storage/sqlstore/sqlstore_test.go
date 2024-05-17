@@ -21,11 +21,12 @@ func TestMain(m *testing.M) {
 	nameDatabase := "restapi_test"
 	authBase := "user:password"
 	flags := "sslmode=disable"
+	fmt.Println("//// ", os.Getenv("DATABASE_HOST"), "  ////")
 	// if os.Getenv("DATABASE_HOST") == "localhost" {
 	authBase = ""
 	// }
 	databaseURL = fmt.Sprintf("postgres://%s@%s:5432/%s?%s", authBase, os.Getenv("DATABASE_HOST"), nameDatabase, flags)
-	databaseURL = "postgres://localhost:5432/restapi_test?sslmode=disable"
+	// !!! databaseURL = "postgres://localhost:5432/restapi_test?sslmode=disable"
 	os.Exit(m.Run())
 }
 

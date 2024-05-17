@@ -1,10 +1,6 @@
 env: "local" #local, dev, prod 
 
-# Для докера
-# databaseURL: "host=db dbname=restapi_script  sslmode=disable user=user password=password"
 
-# Для запуска через Makefile
-# databaseURL:= fmt.Sprintf("host=%s dbname=restapi_script sslmode=disable", os.Getenv("DATABASE_HOST"))
 authbase: "user:password"
 namebase: "restapi_script"
 flags: "sslmode=disable"
