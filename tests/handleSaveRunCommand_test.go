@@ -5,9 +5,11 @@ package tests
 import (
 	"bytes"
 	"encoding/json"
-	"main/internal/lib/logger"
+	// "main/internal/lib/logger"
+	"main/internal/lib/slogdiscard"
 	"main/internal/model"
 	"main/internal/server"
+
 	// "main/internal/storage/sqlstore"
 	"main/internal/storage/teststore"
 	"net/http"
@@ -26,7 +28,8 @@ func TestServer_HandlerInccorectMetodsCreateCommand(t *testing.T) {
 	// storage, teardown := sqlstore.TestDB(t, config.DatabaseURL)
 	// defer teardown(sqlstore.Table)
 
-	var logs = sl.SetupLogger(config.Env)
+	// var logs = sl.SetupLogger(config.Env)
+	var logs = slogdiscard.NewDiscardLogger()
 	s := server.NewServer(config, storage, logs)
 
 	testCase := []struct {
@@ -127,14 +130,15 @@ func TestServer_HandlerInccorectMetodsCreateCommand(t *testing.T) {
 
 // TestServer_HandlerContextCreate checks the correctness of the entered data
 func TestServer_HandlerCommandCreate(t *testing.T) {
-
+	// suppressErrors()
 	config := testNewConfig()
 
 	storage := teststore.New()
 	// storage, teardown := sqlstore.TestDB(t, config.DatabaseURL)
 	// defer teardown(sqlstore.Table)
 
-	var logs = sl.SetupLogger(config.Env)
+	// var logs = sl.SetupLogger(config.Env)
+	var logs = slogdiscard.NewDiscardLogger()
 	s := server.NewServer(config, storage, logs)
 
 	testCase := []struct {
@@ -209,7 +213,7 @@ func TestServer_HandlerCommandCreate_Empty(t *testing.T) {
 	// storage, teardown := sqlstore.TestDB(t, config.DatabaseURL)
 	// defer teardown(sqlstore.Table)
 
-	var logs = sl.SetupLogger(config.Env)
+	var logs = slogdiscard.NewDiscardLogger()
 	s := server.NewServer(config, storage, logs)
 
 	testCase := []struct {

@@ -2,7 +2,8 @@ package tests
 
 import (
 	"fmt"
-	sl "main/internal/lib/logger"
+	// "main/internal/lib/logger"
+	"main/internal/lib/slogdiscard"
 	"main/internal/model"
 	"main/internal/server"
 	"main/internal/storage/teststore"
@@ -23,7 +24,8 @@ func TestServer_HandleInccorectMetodsrDeleteCommand(t *testing.T) {
 	// storage, teardown := sqlstore.TestDB(t, config.StoragePath)
 	// defer teardown(sqlstore.Table)
 
-	var logs = sl.SetupLogger(config.Env)
+	// var logs = sl.SetupLogger(config.Env)
+	var logs = slogdiscard.NewDiscardLogger()
 	s := server.NewServer(config, storage, logs)
 
 	testCase := []struct {
@@ -126,7 +128,8 @@ func TestServer_HandleDeleteCommand(t *testing.T) {
 
 	storage := teststore.New()
 	config := testNewConfig()
-	var logs = sl.SetupLogger(config.Env)
+	// var logs = sl.SetupLogger(config.Env)
+	var logs = slogdiscard.NewDiscardLogger()
 	s := server.NewServer(config, storage, logs)
 
 	testCase := []struct {

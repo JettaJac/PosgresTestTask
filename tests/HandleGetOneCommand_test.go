@@ -3,7 +3,8 @@ package tests
 import (
 	"fmt"
 	// "encoding/json"
-	sl "main/internal/lib/logger"
+	"main/internal/lib/logger"
+	"main/internal/lib/slogdiscard"
 	"main/internal/model"
 	"main/internal/server"
 
@@ -18,14 +19,15 @@ import (
 
 // TestServer_HandlerInccorectGetOneCommand test the correct method
 func TestServer_HandlerInccorectGetOneCommand(t *testing.T) {
-
+	// suppressErrors()
 	config := testNewConfig()
 
 	storage := teststore.New()
 	// storage, teardown := sqlstore.TestDB(t, config.StoragePath)
 	// defer teardown(sqlstore.Table)
 
-	var logs = sl.SetupLogger(config.Env)
+	// var logs = sl.SetupLogger(config.Env)
+	var logs = slogdiscard.NewDiscardLogger()
 	s := server.NewServer(config, storage, logs)
 
 	testCase := []struct {
@@ -125,7 +127,6 @@ func TestServer_HandlerInccorectGetOneCommand(t *testing.T) {
 
 // TestServer_HandleGetOneCommand test the correct data
 func TestServer_HandleGetOneCommand(t *testing.T) {
-
 	storage := teststore.New()
 
 	// storage, teardown := sqlstore.TestDB(t, config.StoragePath)

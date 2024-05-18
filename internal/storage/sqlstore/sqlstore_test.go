@@ -17,21 +17,24 @@ var (
 
 // TestMain is a helper function to setup the test database
 func TestMain(m *testing.M) {
-	// fmt.Println("databaseURL:", databaseURL)
+	// //fmt.Println("databaseURL:", databaseURL)
 	nameDatabase := "restapi_test"
-	authBase := "user:password"
+	authBase := ""
 	flags := "sslmode=disable"
 	fmt.Println("//// ", os.Getenv("DATABASE_HOST"), "  ////")
-	// if os.Getenv("DATABASE_HOST") == "localhost" {
-	authBase = ""
-	// }
+	if os.Getenv("DATABASE_HOST") == "db" {
+		authBase = "user:password"
+	}
 	databaseURL = fmt.Sprintf("postgres://%s@%s:5432/%s?%s", authBase, os.Getenv("DATABASE_HOST"), nameDatabase, flags)
-	// !!! databaseURL = "postgres://localhost:5432/restapi_test?sslmode=disable"
+	databaseURL = "postgres://localhost:5432/restapi_test?sslmode=disable"
+	fmt.Println(databaseURL)
+
 	os.Exit(m.Run())
 }
 
 // TestCommand_CreateRun tests creating a new command
 func TestCommand_CreateRun(t *testing.T) {
+	// //fmt.Println("||||||", databaseURL, "||||||")
 	storage, teardown := sqlstore.TestDB(t, databaseURL)
 	defer teardown(sqlstore.Table)
 
@@ -123,7 +126,7 @@ func TestCommand_DeleteCommand(t *testing.T) {
 	assert.NoError(t, err)
 	assert.NotNil(t, req2.ID)
 	assert.Equal(t, req.ID+1, req2.ID)
-	fmt.Println(id)
+	////fmt.Println(id)
 
 	resp, err := storage.GetOneCommand(id)
 	assert.NotNil(t, resp)

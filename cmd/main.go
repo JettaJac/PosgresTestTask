@@ -1,5 +1,9 @@
 package main
 
+// !!! копираование и запуск из своей папки!
+// убрать вывод логов при тестах
+// приложение работает в докере
+
 import (
 	"log/slog"
 	"main/internal/app"
@@ -28,8 +32,9 @@ func main() {
 	log.Debug("debug messages are enabled")
 
 	if err := app.Run(config); err != nil {
-		log.Error("failed to start server")
+		log.Error("failed to start server", err)
 	}
 
 	log.Info("Server stopped", slog.String("env", config.Env))
+	log.Info("Server stopped", slog.String("address", config.Address)) // !!!
 }

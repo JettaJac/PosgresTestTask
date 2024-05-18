@@ -13,7 +13,7 @@ import (
 
 type Config struct {
 	Env          string `yaml:"env" env-default:"local"`
-	AuthBase     string `yaml:"authbase" env-default:"user:password@"`
+	AuthBase     string `yaml:"authbase" env-default:"user:password"`
 	NameDataBase string `yaml:"namebase" env-default:"restapi_script"`
 	Flags        string `yaml:"flags" env-default:"sslmode=disable"`
 	DatabaseURL  string `yaml:"databaseURL" env:"DATABASE_HOST" env-default:"localhost" env-required:"true"`
@@ -49,6 +49,7 @@ func NewConfig() *Config {
 		log.Fatalf("Error parsing environment variables %v", err)
 	}
 
+	fmt.Println("//// ", os.Getenv("DATABASE_HOST"), "{{{{", os.Getenv("MY_ENV"), "  ////")
 	if os.Getenv("DATABASE_HOST") == "localhost" {
 		config.AuthBase = ""
 	}

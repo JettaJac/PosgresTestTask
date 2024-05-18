@@ -1,35 +1,52 @@
 DB_USER = $(USER)
 DB_MAIN = restapi_script
 DB_TEST = restapi_test
-DATABASE_HOST=localhost
+# PORT=8080
 
-ifeq ($(env),local)
-    DATABASE_HOST=localhost
-endif
 ifeq ($(env),dev)
     DATABASE_HOST=db
-endif
-ifeq ($(env),prod)
+# else ifeq ($(env),local)
+#     DATABASE_HOST=localhost
+else ifeq ($(env),prod)
     DATABASE_HOST=prod-host
+else
+    DATABASE_HOST=localhost
 endif
-	
+
+# DB_USER?= $(DB_USER_ENV)
+
+# ifneq ($(filter local dev prod,$(env)),)
+#     ifeq ($(env),local)
+#         DATABASE_HOST=localhost
+#     endif
+#     ifeq ($(env),dev)
+#         DATABASE_HOST=db
+#     endif
+#     ifeq ($(env),prod)
+#         DATABASE_HOST=prod-host
+#     endif
+# else
+#     DATABASE_HOST=localhost
+# endif
+
+$(chmod 777 init-scripts/create_db.sh)
+
 
 build:
-	chmod 777 init-scripts/create_db.sh
+	
 	cd ..
-
-	DATABASE_HOST=${DATABASE_HOST} go build -v cmd/main.go
+	# export DATABASE_HOST=${DATABASE_HOST}
+	# echo ${DATABASE_HOST}
+	go build -v cmd/main.go 
 
 tests: build
-	cd tests && go test -v
+	cd tests &&  go test -v
 
-testsall: tests	
-		cd internal/storage/sqlstore && go test
-		cd internal/storage/teststore && go test
-
+testsall: 
+		cd internal/storage/sqlstore && DATABASE_HOST=$(DATABASE_HOST) go test
+		cd internal/storage/teststore && DATABASE_HOST=$(DATABASE_HOST) go test
 run: 
-	# echo $(env) 
-	DATABASE_HOST=${DATABASE_HOST} go run cmd/main.go
+	DATABASE_HOST=$(DATABASE_HOST) go run cmd/main.go
 
 db: 
 	@echo "Создание базы данных $(DB_MAIN)"

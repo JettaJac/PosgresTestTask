@@ -3,7 +3,8 @@ package tests
 import (
 	"bytes"
 	"encoding/json"
-	sl "main/internal/lib/logger"
+	"main/internal/lib/logger"
+	"main/internal/lib/slogdiscard"
 	"main/internal/model"
 	"main/internal/server"
 	// "main/internal/storage/sqlstore"
@@ -17,14 +18,15 @@ import (
 
 // TestServer_HandlerInccorectMetodsGetListCommands tests the correct method
 func TestServer_HandlerInccorectMetodsGetListCommands(t *testing.T) {
-
+	// suppressErrors()
 	config := testNewConfig()
 
 	storage := teststore.New()
 	// storage, teardown := sqlstore.TestDB(t, config.DatabaseURL)
 	// defer teardown(sqlstore.Table)
 
-	var logs = sl.SetupLogger(config.Env)
+	// var logs = sl.SetupLogger(config.Env)
+	var logs = slogdiscard.NewDiscardLogger()
 	s := server.NewServer(config, storage, logs)
 
 	testCase := []struct {

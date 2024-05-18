@@ -2,19 +2,20 @@ version: '3.9'
 services:
   app:
     container_name: app
+    depends_on:    
+      - db
     build: 
       context: .
       args:
         LOCAL: "true"
     ports:
       - "8080:8080"
-    depends_on:    
-      - db
+
     links:
       - db 
     environment:
       - DATABASE_URL=postgres://user:password@db:5432/restapi_script
-
+      # - PORT=8080
     networks:
       - enrollment
     
@@ -42,4 +43,5 @@ networks:
 
 
 #   psql -U  user -d restapi_script -c "CREATE DATABASE restapi_test;"
+# psql -U user -d restapi_test -c "CREATE TABLE commandsdb (id SERIAL PRIMARY KEY, script TEXT, result TEXT);"
 #  \l \dt
