@@ -17,24 +17,19 @@ var (
 
 // TestMain is a helper function to setup the test database
 func TestMain(m *testing.M) {
-	// //fmt.Println("databaseURL:", databaseURL)
 	nameDatabase := "restapi_test"
 	authBase := ""
 	flags := "sslmode=disable"
-	fmt.Println("//// ", os.Getenv("DATABASE_HOST"), "  ////")
 	if os.Getenv("DATABASE_HOST") == "db" {
 		authBase = "user:password"
 	}
 	databaseURL = fmt.Sprintf("postgres://%s@%s:5432/%s?%s", authBase, os.Getenv("DATABASE_HOST"), nameDatabase, flags)
-	databaseURL = "postgres://localhost:5432/restapi_test?sslmode=disable"
-	fmt.Println(databaseURL)
-
+	// !!! databaseURL = "postgres://localhost:5432/restapi_test?sslmode=disable"
 	os.Exit(m.Run())
 }
 
 // TestCommand_CreateRun tests creating a new command
 func TestCommand_CreateRun(t *testing.T) {
-	// //fmt.Println("||||||", databaseURL, "||||||")
 	storage, teardown := sqlstore.TestDB(t, databaseURL)
 	defer teardown(sqlstore.Table)
 

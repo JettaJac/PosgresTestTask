@@ -13,7 +13,7 @@ import (
 
 type Config struct {
 	Env          string `yaml:"env" env-default:"local"`
-	AuthBase     string `yaml:"authbase" env-default:"user:password"`
+	AuthBase     string `yaml:"authbase" env-default:""`
 	NameDataBase string `yaml:"namebase" env-default:"restapi_script"`
 	Flags        string `yaml:"flags" env-default:"sslmode=disable"`
 	DatabaseURL  string `yaml:"databaseURL" env:"DATABASE_HOST" env-default:"localhost" env-required:"true"`
@@ -21,7 +21,7 @@ type Config struct {
 }
 
 type HTTPServer struct {
-	Address     string        `yaml:"address" env-default:"localhost:8080"`
+	Address     string        `yaml:"address" env-default:":8080"`
 	Timeout     time.Duration `yaml:"timeout" env-default:"4s"`
 	IdleTimeout time.Duration `yaml:"idle_timeout" env-default:"60s"`
 }
@@ -49,12 +49,10 @@ func NewConfig() *Config {
 		log.Fatalf("Error parsing environment variables %v", err)
 	}
 
-	fmt.Println("//// ", os.Getenv("DATABASE_HOST"), "{{{{", os.Getenv("MY_ENV"), "  ////")
-	if os.Getenv("DATABASE_HOST") == "localhost" {
-		config.AuthBase = ""
+	if os.Getenv("DATABASE_HOST") == "db" {
+		config.AuthBase = "user:password"
 	}
 	config.DatabaseURL = fmt.Sprintf("postgres://%s@%s:5432/%s?%s", config.AuthBase, os.Getenv("DATABASE_HOST"), config.NameDataBase, config.Flags)
-	fmt.Println("HHHHH", config.DatabaseURL, os.Getenv("DATABASE_HOST"))
 
 	return &config
 }

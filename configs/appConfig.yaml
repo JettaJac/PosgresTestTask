@@ -1,12 +1,10 @@
 env: "local" #local, dev, prod 
 
 
-authbase: "user:password"
 namebase: "restapi_script"
 flags: "sslmode=disable"
 databaseURL: "host=localhost dbname=restapi_script  sslmode=disable"
 http_server:
-  address: "localhost:8080"
-  # address: ":8080"
+  address: ":8080"
   timeout: 4s 
   idle_timeout: 1m 

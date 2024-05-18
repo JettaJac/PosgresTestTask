@@ -1,8 +1,7 @@
 package main
 
-// !!! копираование и запуск из своей папки!
-// убрать вывод логов при тестах
-// приложение работает в докере
+//TODO: прикрутить авторизацию
+// TODO: увеличить количество тестов + моки
 
 import (
 	"log/slog"
@@ -11,11 +10,10 @@ import (
 	"main/internal/lib/logger"
 )
 
-// curl -i -X POST -H "Content-Type: application/json" -d '{"name":"test6","script":"#!/bin/bash\necho \"Hello, World\""}' http://127.0.0.1:8080/command/save
-// curl -i -X GET -H "Content-Type: application/json" -d '{"name":"","script":""}' http://127.0.0.1:8080/commands/all
-// curl -i -X GET -H  http://127.0.0.1:8080/command/find?id=5
-// curl -i -X DELETE "http://127.0.0.1:8080/command/delete?id=5"
-// curl -i -X DELETE -H  http://127.0.0.1:8080/command/delete
+// curl -i -X POST -H "Content-Type: application/json" -d '{"script":"#!/bin/bash\necho \"Hello, World\""}' http://127.0.0.1:8080/command/save
+// curl -i -X GET -H "Content-Type: application/json" -d '{"script":""}' http://127.0.0.1:8080/commands/all
+// curl -i -X GET -H "Content-Type: application/json" -d '{"script":""}' "http://127.0.0.1:8080/command/find?id=5"
+// curl -i -X DELETE -H "Content-Type: application/json" -d '{"script":""}'  "http://127.0.0.1:8080/command/delete?id=2"
 // http://localhost:8080/command/find?id=5
 
 const (
@@ -36,5 +34,4 @@ func main() {
 	}
 
 	log.Info("Server stopped", slog.String("env", config.Env))
-	log.Info("Server stopped", slog.String("address", config.Address)) // !!!
 }

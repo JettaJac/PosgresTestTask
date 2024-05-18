@@ -15,7 +15,6 @@ services:
       - db 
     environment:
       - DATABASE_URL=postgres://user:password@db:5432/restapi_script
-      # - PORT=8080
     networks:
       - enrollment
     
@@ -42,6 +41,6 @@ networks:
     driver: bridge   
 
 
-#   psql -U  user -d restapi_script -c "CREATE DATABASE restapi_test;"
+# psql -U  user -d restapi_script -c "CREATE DATABASE restapi_test;"
 # psql -U user -d restapi_test -c "CREATE TABLE commandsdb (id SERIAL PRIMARY KEY, script TEXT, result TEXT);"
-#  \l \dt
+# // psql -U user -d restapi_script -c "SELECT * FROM commandsdb;"
