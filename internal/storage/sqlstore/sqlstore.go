@@ -63,6 +63,22 @@ func migrations(host, path string) {
 	}
 }
 
+// SaveCommand save command to database
+func (s *Storage) SaveRunCommand(req *model.Command) (int, error) { // CreateCommand( - название может такое  ..func GetCommands
+	const op = "storage.sqlstore.SaveRunCommand"
+	query := fmt.Sprintf("INSERT INTO %s (script, result) VALUES ($1, $2) RETURNING id", Table)
+	err := s.db.QueryRow(
+		query,
+		req.Script, req.Result,
+	).Scan(&req.ID)
+
+	if err != nil {
+		return 0, fmt.Errorf("%s: %s", op, err)
+	}
+
+	return req.ID, nil
+}
+
 // GetOneCommand get command by id from database
 func (s *Storage) GetOneCommand(id int) (*model.Command, error) {
 	const op = "storage.sqlstore.GetOneCommand"
@@ -81,22 +97,6 @@ func (s *Storage) GetOneCommand(id int) (*model.Command, error) {
 	}
 
 	return req, nil
-}
-
-// SaveCommand save command to database
-func (s *Storage) SaveRunCommand(req *model.Command) (int, error) { // CreateCommand( - название может такое  ..func GetCommands
-	const op = "storage.sqlstore.SaveRunCommand"
-	query := fmt.Sprintf("INSERT INTO %s (script, result) VALUES ($1, $2) RETURNING id", Table)
-	err := s.db.QueryRow(
-		query,
-		req.Script, req.Result,
-	).Scan(&req.ID)
-
-	if err != nil {
-		return 0, fmt.Errorf("%s: %s", op, err)
-	}
-
-	return req.ID, nil
 }
 
 // GetListCommands get commands from database

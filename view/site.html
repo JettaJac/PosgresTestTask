@@ -1,0 +1,42 @@
+html
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Script Runner</title>
+</head>
+<body>
+  <h1>Script Runner</h1>
+  <form>
+    <label for="script">Enter script:</label>
+    <textarea id="script" name="script"></textarea>
+    <button type="submit">Run script</button>
+  </form>
+  <div id="result"></div>
+
+  <script>
+    const form = document.querySelector('form');
+    const scriptInput = document.querySelector('#script');
+    const resultDiv = document.querySelector('#result');
+
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const script = scriptInput.value;
+      // Save script to database
+      fetch('http://localhost:8080/command/save', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ script }),
+      })
+      .then((response) => response.json())
+      .then(data => {
+          const result = data.result;
+          resultDiv.innerText = `Result: ${result}`;
+      })
+      .catch((error) => {
+        console.error(error);
+        resultDiv.innerText = `Error: ${error.message}`;
+      });
+    });
+  </script>
+</body>
+</html>
