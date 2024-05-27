@@ -2,8 +2,7 @@ package tests
 
 import (
 	"fmt"
-	// "encoding/json"
-	"main/internal/lib/logger"
+	// "main/internal/lib/logger"
 	"main/internal/lib/slogdiscard"
 	"main/internal/model"
 	"main/internal/server"
@@ -133,7 +132,8 @@ func TestServer_HandleGetOneCommand(t *testing.T) {
 	// defer teardown(sqlstore.Table)
 
 	config := testNewConfig()
-	var logs = sl.SetupLogger(config.Env)
+	// var logs = sl.SetupLogger(config.Env)
+	var logs = slogdiscard.NewDiscardLogger()
 	s := server.NewServer(config, storage, logs)
 
 	testCase := []struct {

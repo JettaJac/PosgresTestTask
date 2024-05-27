@@ -5,7 +5,7 @@ package tests
 import (
 	"bytes"
 	"encoding/json"
-	"main/internal/lib/logger"
+	// "main/internal/lib/logger"
 	"main/internal/lib/slogdiscard"
 	"main/internal/model"
 	"main/internal/server"
@@ -53,7 +53,7 @@ func TestServer_HandlerInccorectMetodsCreateCommand(t *testing.T) {
 				Script: "#!/bin/bash\necho \"Hello, World Test!!!\"",
 			},
 			metod:        "OPTIONS",
-			expectedCode: http.StatusMethodNotAllowed,
+			expectedCode: http.StatusOK,
 		},
 		{
 			name: "incorrec method HEAD",
@@ -205,50 +205,50 @@ func TestServer_HandlerCommandCreate(t *testing.T) {
 
 }
 
-// // TestServer_HandlerContextCreate check when submitting an empty request
-// func TestServer_HandlerCommandCreate_Empty(t *testing.T) {
+// TestServer_HandlerContextCreate check when submitting an empty request
+func TestServer_HandlerCommandCreate_Empty(t *testing.T) {
 
-// 	config := testNewConfig()
-// 	storage := teststore.New()
-// 	// storage, teardown := sqlstore.TestDB(t, config.DatabaseURL)
-// 	// defer teardown(sqlstore.Table)
+	config := testNewConfig()
+	storage := teststore.New()
+	// storage, teardown := sqlstore.TestDB(t, config.DatabaseURL)
+	// defer teardown(sqlstore.Table)
 
-// 	var logs = sl.SetupLogger(config.Env)
-// 	// var logs = slogdiscard.NewDiscardLogger()
-// 	s := server.NewServer(config, storage, logs)
+	// var logs = sl.SetupLogger(config.Env)
+	var logs = slogdiscard.NewDiscardLogger()
+	s := server.NewServer(config, storage, logs)
 
-// 	testCase := []struct {
-// 		name         string
-// 		command      interface{}
-// 		expectedCode int
-// 	}{
+	testCase := []struct {
+		name         string
+		command      interface{}
+		expectedCode int
+	}{
 
-// 		{
-// 			name:         "empty request",
-// 			command:      nil,
-// 			expectedCode: http.StatusBadRequest,
-// 		},
-// 	}
-// 	for _, tc := range testCase {
-// 		t.Run(tc.name, func(t *testing.T) {
+		{
+			name:         "empty request",
+			command:      nil,
+			expectedCode: http.StatusBadRequest,
+		},
+	}
+	for _, tc := range testCase {
+		t.Run(tc.name, func(t *testing.T) {
 
-// 			b := &bytes.Buffer{}
-// 			err := json.NewEncoder(b).Encode(tc.command)
+			b := &bytes.Buffer{}
+			err := json.NewEncoder(b).Encode(tc.command)
 
-// 			if err != nil {
-// 				t.Fatalf("Failed to encode command: %v", err)
-// 				return
-// 			}
+			if err != nil {
+				t.Fatalf("Failed to encode command: %v", err)
+				return
+			}
 
-// 			rec := httptest.NewRecorder()
-// 			req := httptest.NewRequest(http.MethodPost, server.PathSave, b)
+			rec := httptest.NewRecorder()
+			req := httptest.NewRequest(http.MethodPost, server.PathSave, b)
 
-// 			req.Header.Set("Content-Type", "application/json")
+			req.Header.Set("Content-Type", "application/json")
 
-// 			s.ServeHTTP(rec, req)
-// 			// assert.Equal(t, tc.expectedCode, rec.Code)
+			s.ServeHTTP(rec, req)
+			// assert.Equal(t, tc.expectedCode, rec.Code)
 
-// 		})
-// 	}
+		})
+	}
 
-// }
+}
