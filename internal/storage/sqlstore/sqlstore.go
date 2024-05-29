@@ -36,7 +36,7 @@ func NewDB(storagePath string) (*Storage, error) {
 	}
 
 	if err := db.Ping(); err != nil {
-		return nil, fmt.Errorf("%s: %w", op, err)
+		return nil, fmt.Errorf("%s.Ping: %w", op, err)
 	}
 
 	migrations(storagePath, ".")

@@ -44,3 +44,4 @@ networks:
 # psql -U  user -d restapi_script -c "CREATE DATABASE restapi_test;"
 # psql -U user -d restapi_test -c "CREATE TABLE commandsdb (id SERIAL PRIMARY KEY, script TEXT, result TEXT);"
 # // psql -U user -d restapi_script -c "SELECT * FROM commandsdb;"
+# docker-compose build

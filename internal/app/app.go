@@ -16,7 +16,7 @@ func Run(config *config.Config) error {
 	log := sl.SetupLogger(config.Env)
 	storage, err := sqlstore.NewDB(config.DatabaseURL)
 	if err != nil {
-		log.Error("failed to init storage", sl.Err(err))
+		log.Error("app.Run: Failed to init storage", sl.Err(err))
 		os.Exit(1)
 	}
 	log.Info("Сonnected to the database", slog.String("env", config.Env))

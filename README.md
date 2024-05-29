@@ -30,7 +30,7 @@ API-приложение предоставляет следующую функ�
  
 - go run cmd/main.go
 - make (используя Makefile)
-- docker-compose up --build && docker start app (используя Docker)
+- docker-compose up --build (используя Docker)
 
 ##
 ## Запуск тестов
